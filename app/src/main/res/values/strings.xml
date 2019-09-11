@@ -1,4 +1,6 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    
     <string name="app_name">Go4Lunch</string>
     <string name="sign_in_with_email">SIGN IN WITH EMAIL</string>
     <string name="sign_in_with_facebook">SIGN IN WITH FACEBOOK</string>
@@ -6,4 +8,19 @@
     <string name="sign_in_with_twitter">SIGN IN WITH TWITTER</string>
     <string name="food_image">food_image</string>
     <string name="go4lunch">Go4Lunch</string>
+    <string name="error_not_connected">You must be connected</string>
+    <string name="error_authentication_canceled">Authentication canceled</string>
+    <string name="error_no_internet">No internet connection</string>
+    <string name="error_unknown_error">Unknown error</string>
+    <string name="connection_succeed">Authentication successful</string>
+    <string name="button_login_text_logged">Show profile</string>
+    <string name="button_login_text_not_logged">Connection</string>
+    
+    
+    <string name="facebook_application_id" translatable="false">750267768727522</string>
+    <string name="facebook_login_protocol_scheme" translatable="false"
+        tools:ignore="UnusedResources">fb750267768727522</string>
+    
+    <string name="twitter_consumer_key" translatable="false">iq6nJsR2PQm9AeCTFhNi1sS1P</string>
+    <string name="twitter_consumer_secret" translatable="false">nfnB01cMJy5LzGGSDtQ2LE4mdtlWP8I9stoW3rRTdpYw3h0Egw</string>
 </resources>

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+
 <androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/main_constraint_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -13,7 +15,7 @@
         android:id="@+id/background_image_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/jenn_kosar_jrWoDRmhwRY_unsplash"
+        android:background="@drawable/food_image"
         android:scaleX="1.2"
         android:contentDescription="@string/food_image"/>
 
@@ -23,7 +25,7 @@
         android:layout_width="@dimen/fui_auth_method_button_width"
         android:layout_height="@dimen/fui_auth_method_button_width"
         android:scaleX="0.8"
-        android:background="@drawable/LogoMakr_0fzLp7"
+        android:background="@drawable/app_logo"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/app_title"
         app:layout_constraintEnd_toEndOf="parent"
