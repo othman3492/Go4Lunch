@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <item
+            android:id="@+id/main_page_drawer_lunch"
+            android:title="@string/your_lunch" />
+        <item
+            android:id="@+id/main_page_drawer_settings"
+            android:title="@string/settings" />
+        <item
+            android:id="@+id/main_page_drawer_logout"
+            android:title="@string/logout" />
+
+</menu>

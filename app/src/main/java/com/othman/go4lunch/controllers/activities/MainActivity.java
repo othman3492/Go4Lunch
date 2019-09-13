@@ -1,4 +1,4 @@
-package com.othman.go4lunch;
+package com.othman.go4lunch.controllers.activities;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +14,7 @@ import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.j2objc.annotations.ObjectiveCName;
+import com.othman.go4lunch.R;
 
 import java.util.Arrays;
 
@@ -135,7 +136,10 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
+                // Show message and start MainPageActivity
                 showSnackbar(constraintLayout, getString(R.string.connection_succeed));
+                Intent intent = new Intent(MainActivity.this, MainPageActivity.class);
+                startActivity(intent);
             } else {
                 if (response == null) {
                     showSnackbar(constraintLayout, getString(R.string.error_authentication_canceled));
