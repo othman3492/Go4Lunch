@@ -13,7 +13,6 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.j2objc.annotations.ObjectiveCName;
 import com.othman.go4lunch.R;
 
 import java.util.Arrays;
@@ -37,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Remove toolbar on main screen
-        getSupportActionBar().hide();
+        //getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);

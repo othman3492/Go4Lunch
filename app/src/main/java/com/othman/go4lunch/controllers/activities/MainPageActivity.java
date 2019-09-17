@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.othman.go4lunch.R;
@@ -34,16 +36,27 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
     @BindView(R.id.activity_main_page_bottom_nav_view)
     BottomNavigationView bottomNavigationView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_page);
         ButterKnife.bind(this);
 
+        setSupportActionBar(mainToolbar);
+
         // Configure UI
+        setMapFragmentOnStartActivity();
         navigationView.setNavigationItemSelectedListener(this);
         configureDrawerLayout();
         configureBottomNavigationView();
+    }
+
+    // Display map by default when app starts
+    private void setMapFragmentOnStartActivity() {
+
+        Fragment fragment = new MapFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
     }
 
     // Configure menu in the toolbar
@@ -57,7 +70,6 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
 
     private void configureDrawerLayout() {
-        this.drawerLayout = findViewById(R.id.activity_main_page_drawer_layout);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout,
                 mainToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -80,33 +92,55 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
     // Configure Bottom Navigation View and display fragments
     private void configureBottomNavigationView() {
 
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                Fragment selectedFragment = null;
+        bottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
+            Fragment selectedFragment = null;
 
-                switch (menuItem.getItemId()) {
+            switch (menuItem.getItemId()) {
 
-                    case R.id.bottom_map :
-                        selectedFragment = new MapFragment();
-                        break;
-                    case R.id.bottom_list_view :
-                        selectedFragment = new ListFragment();
-                        break;
-                    case R.id.bottom_workmates :
-                        selectedFragment = new WorkmatesFragment();
-                }
-
-                // Display fragment depending on item selected
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
-
-                return true;
+                case R.id.bottom_map :
+                    selectedFragment = new MapFragment();
+                    break;
+                case R.id.bottom_list_view :
+                    selectedFragment = new ListFragment();
+                    break;
+                case R.id.bottom_workmates :
+                    selectedFragment = new WorkmatesFragment();
             }
+
+            // Display fragment depending on item selected
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+
+            return true;
         });
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+
+        switch (menuItem.getItemId()) {
+
+            case R.id.main_page_drawer_lunch :
+            break;
+            case R.id.main_page_drawer_settings :
+            break;
+            case R.id.main_page_drawer_logout :
+                signOutFromFirebase();
+            break;
+        }
+
+
         return false;
+    }
+
+
+    private void signOutFromFirebase() {
+
+        AuthUI.getInstance().signOut(this).addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted());
+    }
+
+
+    private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted() {
+
+        return aVoid -> finish();
     }
 }

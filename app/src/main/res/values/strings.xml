@@ -16,9 +16,10 @@
     <string name="button_login_text_logged">Show profile</string>
     <string name="button_login_text_not_logged">Connection</string>
 
-
-    <string name="facebook_application_id" translatable="false">750267768727522</string>
-    <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">fb750267768727522</string>
+    <string name="facebook_application_id" translatable="false">390333651683057</string>
+    <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">fb390333651683057</string>
+    
+    <string name="google_maps_api_key">AIzaSyCL9H63r5Z9zX7QQ2UVPzJ5iTCFVrz3iTE</string>
 
     <string name="twitter_consumer_key" translatable="false">iq6nJsR2PQm9AeCTFhNi1sS1P</string>
     <string name="twitter_consumer_secret" translatable="false">nfnB01cMJy5LzGGSDtQ2LE4mdtlWP8I9stoW3rRTdpYw3h0Egw</string>
