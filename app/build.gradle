@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
 
+def TWITTER_CLIENT_ID = '"' + twitter_client_id + '"' ?: "Define key"
+def TWITTER_CLIENT_SECRET = '"' + twitter_client_secret + '"' ?: "Define key"
+def GOOGLE_APIKEY = '"' + google_apikey + '"' ?: "Define key"
+def STRING = 'String'
+
 android {
     compileSdkVersion 29
     defaultConfig {
@@ -16,6 +21,13 @@ android {
             sourceCompatibility = "8"
         }
     }
+
+    buildTypes.each {
+        it.buildConfigField STRING, 'twitter_client_id', TWITTER_CLIENT_ID
+        it.buildConfigField STRING, 'twitter_client_secret', TWITTER_CLIENT_SECRET
+        it.buildConfigField STRING, 'google_apikey', GOOGLE_APIKEY
+    }
+
     buildTypes {
         release {
             minifyEnabled false
