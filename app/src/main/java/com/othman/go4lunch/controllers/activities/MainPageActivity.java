@@ -4,14 +4,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,15 +29,20 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.controllers.fragments.ListFragment;
 import com.othman.go4lunch.controllers.fragments.MapFragment;
 import com.othman.go4lunch.controllers.fragments.WorkmatesFragment;
+import com.othman.go4lunch.models.GooglePlacesSearch;
+import com.othman.go4lunch.utils.GoogleAPIStreams;
 
 import org.w3c.dom.Text;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 
 public class MainPageActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -47,6 +55,8 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
     NavigationView navigationView;
     @BindView(R.id.activity_main_page_bottom_nav_view)
     BottomNavigationView bottomNavigationView;
+
+    private Disposable disposable;
 
 
     @Override
@@ -80,6 +90,22 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
     public boolean onCreateOptionsMenu(Menu menu) {
 
         getMenuInflater().inflate(R.menu.main_page_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.menu_activity_main_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                searchView.clearFocus();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
 
         return true;
     }
@@ -196,4 +222,33 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
         return aVoid -> finish();
     }
+
+
+    // Execute HTTP request and retrieve nearby places after search
+    /*private void executeSearchNearbyPlacesRequest() {
+
+        this.disposable = GoogleAPIStreams.streamFetchPlaces(BuildConfig.google_apikey, location, 50, type)
+                .subscribeWith(new DisposableObserver<GooglePlacesSearch>() {
+                    @Override
+                    public void onNext(GooglePlacesSearch googlePlacesSearch) {
+
+                        Log.e("TAG", "On Next");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        Log.e("TAG", "On Error" + Log.getStackTraceString(e));
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                        Log.e("TAG", "On Complete");
+                    }
+                });*/
 }
+
+
+
