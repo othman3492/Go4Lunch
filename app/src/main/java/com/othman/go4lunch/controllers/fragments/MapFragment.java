@@ -10,6 +10,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,15 +31,21 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.compat.PlaceDetectionClient;
 import com.google.android.libraries.places.compat.Places;
+import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
+import com.othman.go4lunch.models.GooglePlacesSearch;
+import com.othman.go4lunch.utils.GoogleAPIStreams;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
-    @BindView(R.id.map_view) MapView mapView;
+    @BindView(R.id.map_view)
+    MapView mapView;
 
     private GoogleMap googleMap;
     private CameraPosition cameraPosition;
@@ -55,11 +62,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     // Last known location retrieved by the Fused Location Provider
     private Location lastKnownLocation;
+    private LatLng currentLocation;
 
     // Keys for storing fragment state
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
-
+    private Disposable disposable;
 
 
     public MapFragment() {
@@ -119,37 +127,40 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        // Ask for permission, get location and set position of the map
+        // Ask for permission, get location and set position of the map, then execute Nearby Places request
         getLocationPermission();
         updateLocationUI();
         getDeviceLocation();
+
+        //executeSearchNearbyPlacesRequest();
 
     }
 
 
     // Get current location of the device and position the map's camera
-    private void getDeviceLocation() {
+    private LatLng getDeviceLocation() {
 
         if (locationPermissionGranted) {
 
             Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-            locationResult.addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
-                @Override
-                public void onComplete(@NonNull Task<Location> task) {
+            locationResult.addOnCompleteListener(getActivity(), task -> {
 
-                    if (task.isSuccessful()) {
+                if (task.isSuccessful()) {
 
-                        // Set the map's camera
-                        lastKnownLocation = task.getResult();
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-                    } else {
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
-                        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-                    }
+                    // Set the map's camera
+                    lastKnownLocation = task.getResult();
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                            currentLocation = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
                 }
             });
+
+        } else {
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+            googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+            currentLocation = defaultLocation;
         }
+
+        return currentLocation;
     }
 
 
@@ -174,7 +185,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         switch (requestCode) {
 
-            case LOCATION_REQUEST_CODE : {
+            case LOCATION_REQUEST_CODE: {
                 // If request is cancelled, the result arrays are empty
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     locationPermissionGranted = true;
@@ -187,17 +198,47 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     // Update the map's UI settings if location permission is granted
     private void updateLocationUI() {
+
         if (googleMap == null) {
             return;
         }
-            if (locationPermissionGranted) {
-                googleMap.setMyLocationEnabled(true);
-                googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-            } else {
-                googleMap.setMyLocationEnabled(false);
-                googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-                lastKnownLocation = null;
-                getLocationPermission();
-            }
+        if (locationPermissionGranted) {
+            googleMap.setMyLocationEnabled(true);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        } else {
+            googleMap.setMyLocationEnabled(false);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+            lastKnownLocation = null;
+            getLocationPermission();
+        }
+    }
+
+
+    // Execute HTTP request and retrieve nearby places on map
+    private void executeSearchNearbyPlacesRequest() {
+
+        String location = "43.4722515,3.7749125";
+
+        this.disposable = GoogleAPIStreams.streamFetchPlaces(BuildConfig.google_apikey, location, 50000).subscribeWith(
+                new DisposableObserver<GooglePlacesSearch>() {
+                    @Override
+                    public void onNext(GooglePlacesSearch googlePlacesSearch) {
+
+                        Log.e("TAG", "On Next " + googlePlacesSearch.getCandidates().get(0).getName());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        Log.e("TAG", "On Error" + Log.getStackTraceString(e));
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                        Log.e("TAG", "On Complete");
+                    }
+                });
     }
 }

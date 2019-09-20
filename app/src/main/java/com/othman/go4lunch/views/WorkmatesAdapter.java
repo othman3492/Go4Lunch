@@ -9,98 +9,84 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.othman.go4lunch.R;
+import com.othman.go4lunch.models.Workmate;
+import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/*public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.WorkmatesViewHolder> {
+public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.WorkmatesViewHolder> {
 
 
-// Interface to configure a listener on RecyclerView items
-public interface RecyclerViewOnClickListener {
+    // Interface to configure a listener on RecyclerView items
+    public interface RecyclerViewOnClickListener {
 
-    void recyclerViewOnClick(int position);
-}
+        void recyclerViewOnClick(int position);
+    }
 
 
     private final List<Workmate> workmatesList;
-    private final RecyclerViewOnClickListener listener;
 
 
-    public WorkmatesAdapter(List<Workmate> workmatesList, RecyclerViewOnClickListener listener) {
+    public WorkmatesAdapter(List<Workmate> workmatesList) {
 
         this.workmatesList = workmatesList;
-        this.listener = listener;
     }
 
 
     @NonNull
     @Override
-    public ArticlesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public WorkmatesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.workmates_layout, parent, false);
 
-        return new ArticlesViewHolder(v, listener);
+        return new WorkmatesViewHolder(v);
     }
 
 
     @Override
-    public void onBindViewHolder(@NonNull ArticlesViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull WorkmatesViewHolder viewHolder, int position) {
 
 
         viewHolder.populateViewHolder(this.workmatesList.get(position));
     }
 
-
     @Override
     public int getItemCount() {
 
         return workmatesList.size();
-
     }
 
 
-
-class ArticlesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-
-    @BindView(R.id.workmates_image)
-    ImageView workmateImage;
-    @BindView(R.id.workmates_text_view)
-    TextView workmateText;
-
-    final RecyclerViewOnClickListener recyclerViewOnClickListener;
+    class WorkmatesViewHolder extends RecyclerView.ViewHolder {
 
 
-    ArticlesViewHolder(View view, RecyclerViewOnClickListener listener) {
-        super(view);
-        ButterKnife.bind(this, view);
-        this.recyclerViewOnClickListener = listener;
-        view.setOnClickListener(this);
-
-    }
+        @BindView(R.id.workmates_image)
+        ImageView workmateImage;
+        @BindView(R.id.workmates_text_view)
+        TextView workmateText;
 
 
-    // Update UI with text and image
-    void populateViewHolder(Workmate workmate) {
+        WorkmatesViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
 
-        workmateText.setText(article.getSection());
-
-
-
+        }
 
 
+        // Update UI with text and image
+        void populateViewHolder(Workmate workmate) {
 
-    }
 
-    @Override
-    public void onClick(View v) {
+            workmateText.setText("Hello ! I'm your workmate.");
 
-        recyclerViewOnClickListener.recyclerViewOnClick(getAdapterPosition());
+            Picasso.get().load(R.drawable.app_logo).into(workmateImage);
 
+
+        }
     }
 }
-
-} {
-}*/

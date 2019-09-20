@@ -15,11 +15,11 @@ import io.reactivex.schedulers.Schedulers;
 public interface GoogleAPIStreams {
 
 
-    static Observable<GooglePlacesSearch> streamFetchPlaces(String key, String location, int radius, String type) {
+    static Observable<GooglePlacesSearch> streamFetchPlaces(String key, String location, int radius) {
 
         GoogleAPIService googleAPIService = GoogleAPIService.retrofitGooglePlaces.create(GoogleAPIService.class);
 
-        return googleAPIService.getPlaces(key, location, radius, type)
+        return googleAPIService.getPlaces(key, location, radius)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .timeout(10, TimeUnit.SECONDS);

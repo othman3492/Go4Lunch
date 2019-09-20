@@ -16,8 +16,7 @@ public interface GoogleAPIService {
     @GET("nearbysearch/json")
     Observable<GooglePlacesSearch> getPlaces(@Query("key") String key,
                                                           @Query("location") String location,
-                                                          @Query("radius") int radius,
-                                                          @Query("type") String type);
+                                                          @Query("radius") int radius);
 
     Retrofit retrofitGooglePlaces = new Retrofit.Builder()
             .baseUrl("https://maps.googleapis.com/maps/api/place/")

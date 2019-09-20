@@ -11,6 +11,8 @@ import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -36,6 +38,7 @@ import com.othman.go4lunch.controllers.fragments.MapFragment;
 import com.othman.go4lunch.controllers.fragments.WorkmatesFragment;
 import com.othman.go4lunch.models.GooglePlacesSearch;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
+import com.twitter.sdk.android.core.models.Search;
 
 import org.w3c.dom.Text;
 
@@ -91,22 +94,11 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
         getMenuInflater().inflate(R.menu.main_page_menu, menu);
 
-        MenuItem searchItem = menu.findItem(R.id.menu_activity_main_search);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-
-                searchView.clearFocus();
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-
+        // Configure the SearchView
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.menu_activity_main_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(true);
         return true;
     }
 
@@ -223,31 +215,6 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
         return aVoid -> finish();
     }
 
-
-    // Execute HTTP request and retrieve nearby places after search
-    /*private void executeSearchNearbyPlacesRequest() {
-
-        this.disposable = GoogleAPIStreams.streamFetchPlaces(BuildConfig.google_apikey, location, 50, type)
-                .subscribeWith(new DisposableObserver<GooglePlacesSearch>() {
-                    @Override
-                    public void onNext(GooglePlacesSearch googlePlacesSearch) {
-
-                        Log.e("TAG", "On Next");
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                        Log.e("TAG", "On Error" + Log.getStackTraceString(e));
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                        Log.e("TAG", "On Complete");
-                    }
-                });*/
 }
 
 

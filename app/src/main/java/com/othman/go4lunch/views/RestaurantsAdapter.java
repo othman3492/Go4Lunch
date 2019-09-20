@@ -10,13 +10,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.othman.go4lunch.R;
+import com.othman.go4lunch.models.Restaurant;
+import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/*public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.RestaurantsViewHolder> {
+
+public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.RestaurantsViewHolder> {
 
 
     // Interface to configure a listener on RecyclerView items
@@ -100,10 +104,15 @@ import butterknife.ButterKnife;
         // Update UI with text and image
         void populateViewHolder(Restaurant restaurant) {
 
+            restaurantName.setText("Restaurant");
+            restaurantTypeAndAddress.setText("Korean" + " - " + "10 Victory Street");
+            restaurantHours.setText("Open until 10pm");
+            restaurantDistance.setText("250m");
+            restaurantWorkmatesNumber.setText("3");
 
-
-
-
+            Picasso.get().load(R.drawable.food_image).into(restaurantImage);
+            Picasso.get().load(R.drawable.baseline_people_alt_24).into(restaurantWorkmates);
+            Picasso.get().load(R.drawable.baseline_star_24).into(restaurantStars);
 
 
         }
@@ -117,4 +126,3 @@ import butterknife.ButterKnife;
     }
 
 }
-*/
