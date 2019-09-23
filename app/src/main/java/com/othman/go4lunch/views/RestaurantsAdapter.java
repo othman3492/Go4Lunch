@@ -110,7 +110,7 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
             restaurantDistance.setText("250m");
             restaurantWorkmatesNumber.setText("3");
 
-            Picasso.get().load(R.drawable.food_image).into(restaurantImage);
+            Picasso.get().load(R.drawable.app_logo).into(restaurantImage);
             Picasso.get().load(R.drawable.baseline_people_alt_24).into(restaurantWorkmates);
             Picasso.get().load(R.drawable.baseline_star_24).into(restaurantStars);
 

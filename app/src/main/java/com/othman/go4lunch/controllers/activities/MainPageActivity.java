@@ -153,10 +153,14 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
         switch (menuItem.getItemId()) {
 
+            // Open restaurant details
             case R.id.main_page_drawer_lunch:
+                Intent intent = new Intent(MainPageActivity.this, RestaurantDetailsActivity.class);
+                startActivity(intent);
                 break;
             case R.id.main_page_drawer_settings:
                 break;
+            // Sign out from app
             case R.id.main_page_drawer_logout:
                 signOutFromFirebase();
                 break;
