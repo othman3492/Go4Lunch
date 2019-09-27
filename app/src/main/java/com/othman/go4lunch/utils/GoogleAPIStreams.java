@@ -3,8 +3,8 @@ package com.othman.go4lunch.utils;
 
 // Make HTTP requests on Google Places API
 
+import com.othman.go4lunch.models.GooglePlaces;
 import com.othman.go4lunch.models.GooglePlacesDetails;
-import com.othman.go4lunch.models.GooglePlacesSearch;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,14 +15,14 @@ import io.reactivex.schedulers.Schedulers;
 public interface GoogleAPIStreams {
 
 
-    static Observable<GooglePlacesSearch> streamFetchPlaces(String key, String location, int radius) {
+    static Observable<GooglePlaces> streamFetchPlaces(String key, String type, String location, int radius) {
 
         GoogleAPIService googleAPIService = GoogleAPIService.retrofitGooglePlaces.create(GoogleAPIService.class);
 
-        return googleAPIService.getPlaces(key, location, radius)
+        return googleAPIService.getPlaces(location, type, radius, key)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .timeout(10, TimeUnit.SECONDS);
+                .timeout(100, TimeUnit.SECONDS);
     }
 
 
@@ -33,7 +33,7 @@ public interface GoogleAPIStreams {
         return googleAPIService.getPlacesDetails(key, placeId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .timeout(10, TimeUnit.SECONDS);
+                .timeout(100, TimeUnit.SECONDS);
     }
 
 

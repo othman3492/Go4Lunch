@@ -6,8 +6,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
@@ -21,7 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
 
     // Identifier for sign-in activity
@@ -137,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 // Show message and start MainPageActivity
                 showSnackbar(constraintLayout, getString(R.string.connection_succeed));
-                Intent intent = new Intent(MainActivity.this, MainPageActivity.class);
+                Intent intent = new Intent(LoginActivity.this, MainPageActivity.class);
                 startActivity(intent);
             } else {
                 if (response == null) {

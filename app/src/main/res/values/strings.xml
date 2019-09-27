@@ -60,4 +60,6 @@
     <string name="like">LIKE</string>
     <string name="website">WEBSITE</string>
     <string name="website_button">Website button</string>
+    <string name="open">Open</string>
+    <string name="closed">Closed</string>
 </resources>

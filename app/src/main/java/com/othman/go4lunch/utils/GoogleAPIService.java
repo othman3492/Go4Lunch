@@ -1,7 +1,7 @@
 package com.othman.go4lunch.utils;
 
+import com.othman.go4lunch.models.GooglePlaces;
 import com.othman.go4lunch.models.GooglePlacesDetails;
-import com.othman.go4lunch.models.GooglePlacesSearch;
 
 import io.reactivex.Observable;
 import retrofit2.Retrofit;
@@ -13,10 +13,11 @@ import retrofit2.http.Query;
 public interface GoogleAPIService {
 
 
-    @GET("nearbysearch/json")
-    Observable<GooglePlacesSearch> getPlaces(@Query("key") String key,
-                                                          @Query("location") String location,
-                                                          @Query("radius") int radius);
+    @GET("nearbysearch/json?")
+    Observable<GooglePlaces> getPlaces(@Query("location") String location,
+                                       @Query("type") String type,
+                                       @Query("radius") int radius,
+                                       @Query("key") String key);
 
     Retrofit retrofitGooglePlaces = new Retrofit.Builder()
             .baseUrl("https://maps.googleapis.com/maps/api/place/")
@@ -25,7 +26,7 @@ public interface GoogleAPIService {
             .build();
 
 
-    @GET("details/json")
+    @GET("details/json?")
     Observable<GooglePlacesDetails> getPlacesDetails(@Query("key") String key,
                                                      @Query("place_id") String placeId);
 

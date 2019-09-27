@@ -31,7 +31,7 @@
         app:layout_constraintTop_toBottomOf="@id/restaurant_details_image">
 
         <ImageView
-            android:id="@+id/restaurant_details_stars"
+            android:id="@+id/restaurant_details_star_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/stars"
@@ -40,12 +40,31 @@
             app:layout_constraintTop_toTopOf="@id/restaurant_details_name"
             android:background="@drawable/baseline_star_24"/>
 
+        <ImageView
+            android:id="@+id/restaurant_details_star_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/stars"
+            app:layout_constraintBottom_toBottomOf="@id/restaurant_details_name"
+            app:layout_constraintStart_toEndOf="@id/restaurant_details_star_1"
+            app:layout_constraintTop_toTopOf="@id/restaurant_details_name"
+            android:background="@drawable/baseline_star_24"/>
+
+        <ImageView
+            android:id="@+id/restaurant_details_star_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/stars"
+            app:layout_constraintBottom_toBottomOf="@id/restaurant_details_name"
+            app:layout_constraintStart_toEndOf="@id/restaurant_details_star_2"
+            app:layout_constraintTop_toTopOf="@id/restaurant_details_name"
+            android:background="@drawable/baseline_star_24"/>
+
         <TextView
             android:id="@+id/restaurant_details_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingEnd="15dp"
-            android:text="Nom du resto"
             android:textColor="@color/white"
             android:textStyle="bold"
             android:textSize="20sp"
@@ -57,7 +76,6 @@
             android:id="@+id/restaurant_details_type_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="French - 12 rue du Faubourg"
             android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/restaurant_details_name"

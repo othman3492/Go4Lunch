@@ -16,10 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.compat.GeoDataClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,12 +26,11 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.compat.PlaceDetectionClient;
 import com.google.android.libraries.places.compat.Places;
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
-import com.othman.go4lunch.models.GooglePlacesSearch;
+import com.othman.go4lunch.models.GooglePlaces;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
 
 import butterknife.BindView;
@@ -132,7 +129,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         updateLocationUI();
         getDeviceLocation();
 
-        //executeSearchNearbyPlacesRequest();
+        executeSearchNearbyPlacesRequest();
 
     }
 
@@ -183,13 +180,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         locationPermissionGranted = false;
 
-        switch (requestCode) {
-
-            case LOCATION_REQUEST_CODE: {
-                // If request is cancelled, the result arrays are empty
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    locationPermissionGranted = true;
-                }
+        // If request is cancelled, the result arrays are empty
+        if (requestCode == LOCATION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                locationPermissionGranted = true;
             }
         }
         updateLocationUI();
@@ -214,17 +208,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    // Execute HTTP request and retrieve nearby places on map
+    // Execute HTTP request to retrieve nearby places
     private void executeSearchNearbyPlacesRequest() {
 
+        String type = "restaurant";
         String location = "43.4722515,3.7749125";
+        String key = BuildConfig.google_apikey;
 
-        this.disposable = GoogleAPIStreams.streamFetchPlaces(BuildConfig.google_apikey, location, 50000).subscribeWith(
-                new DisposableObserver<GooglePlacesSearch>() {
+        this.disposable = GoogleAPIStreams.streamFetchPlaces(key, type, location, 2000).subscribeWith(
+                new DisposableObserver<GooglePlaces>() {
                     @Override
-                    public void onNext(GooglePlacesSearch googlePlacesSearch) {
+                    public void onNext(GooglePlaces googlePlaces) {
 
-                        Log.e("TAG", "On Next " + googlePlacesSearch.getCandidates().get(0).getName());
+                        Log.e("TAG", "On Next");
                     }
 
                     @Override

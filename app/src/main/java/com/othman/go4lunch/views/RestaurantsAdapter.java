@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.othman.go4lunch.R;
@@ -75,8 +76,8 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
         ImageView restaurantImage;
         @BindView(R.id.restaurant_workmates)
         ImageView restaurantWorkmates;
-        @BindView(R.id.restaurant_stars)
-        ImageView restaurantStars;
+        @BindView(R.id.restaurant_star_1)
+        ImageView restaurantStar1;
         @BindView(R.id.restaurant_name)
         TextView restaurantName;
         @BindView(R.id.restaurant_type_and_address)
@@ -104,15 +105,19 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
         // Update UI with text and image
         void populateViewHolder(Restaurant restaurant) {
 
-            restaurantName.setText("Restaurant");
-            restaurantTypeAndAddress.setText("Korean" + " - " + "10 Victory Street");
-            restaurantHours.setText("Open until 10pm");
-            restaurantDistance.setText("250m");
+            restaurantName.setText(restaurant.getName());
+            restaurantTypeAndAddress.setText(restaurant.getType() + " - " + restaurant.getAddress());
             restaurantWorkmatesNumber.setText("3");
 
-            Picasso.get().load(R.drawable.app_logo).into(restaurantImage);
-            Picasso.get().load(R.drawable.baseline_people_alt_24).into(restaurantWorkmates);
-            Picasso.get().load(R.drawable.baseline_star_24).into(restaurantStars);
+            if (restaurant.isOpenNow()) {
+                restaurantHours.setText(R.string.open);
+                restaurantHours.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.Open));
+            } else {
+                restaurantHours.setText(R.string.closed);
+                restaurantHours.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.Closed));
+            }
+
+            Picasso.get().load(restaurant.getImageUrl()).into(restaurantImage);
 
 
         }
