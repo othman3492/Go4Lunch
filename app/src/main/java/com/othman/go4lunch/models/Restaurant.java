@@ -2,8 +2,14 @@ package com.othman.go4lunch.models;
 
 
 import com.othman.go4lunch.BuildConfig;
+import com.othman.go4lunch.utils.GoogleAPIStreams;
 
-public class Restaurant {
+import java.io.Serializable;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+
+public class Restaurant implements Serializable {
 
     private String name;
     private String type;
@@ -15,6 +21,8 @@ public class Restaurant {
     private boolean isOpenNow;
     private String imageUrl;
     private String placeId;
+
+    private Disposable disposable;
 
     public String getPlaceId() {
         return placeId;
@@ -123,6 +131,44 @@ public class Restaurant {
                     + "&key=" + BuildConfig.google_apikey;
 
 
+        executePlacesDetailsRequest(restaurant, restaurant.placeId);
+
+
         return restaurant;
+    }
+
+
+    // Execute HTTP request to retrieve more information from the place
+    private void executePlacesDetailsRequest(Restaurant restaurant, String placeId) {
+
+        String key = BuildConfig.google_apikey;
+
+        this.disposable = GoogleAPIStreams.streamFetchPlacesDetails(key, placeId).subscribeWith(
+                new DisposableObserver<GooglePlacesDetails>() {
+
+                    @Override
+                    public void onNext(GooglePlacesDetails googlePlacesDetails) {
+
+                        addDataFromDetailsRequest(restaurant, googlePlacesDetails.getResult());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+
+    private void addDataFromDetailsRequest(Restaurant restaurant, GooglePlacesDetails.Result result) {
+
+        restaurant.rating = result.getRating();
+        restaurant.phoneNumber = result.getFormattedPhoneNumber();
+        restaurant.website = result.getWebsite();
     }
 }

@@ -5,11 +5,14 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
@@ -19,6 +22,7 @@ import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.models.Workmate;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
 import com.othman.go4lunch.views.WorkmatesAdapter;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +38,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     @BindView(R.id.restaurant_details_name)
     TextView restaurantName;
     @BindView(R.id.restaurant_details_type_address)
-    TextView restaurantTypeAndAddress;
+    TextView restaurantAddress;
     @BindView(R.id.restaurant_details_image)
     ImageView restaurantImage;
     @BindView(R.id.call_constraint_layout)
@@ -62,7 +66,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_restaurant_details);
         ButterKnife.bind(this);
 
-        executePlacesDetailsRequest();
+        updateData();
 
         workmateList = new ArrayList<>();
         addWorkmates();
@@ -77,14 +81,72 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     }
 
 
-    // Fill activity with restaurant data
-    private void updateData(GooglePlacesDetails.Result result) {
+    // Update activity with restaurant data
+    private void updateData() {
+
+        Intent intent = getIntent();
+        Restaurant restaurant = (Restaurant) intent.getSerializableExtra("RESTAURANT");
+
+        restaurantName.setText(restaurant.getName());
+        restaurantAddress.setText(restaurant.getAddress());
+
+        Picasso.get().load(restaurant.getImageUrl()).into(restaurantImage);
+
+        // Display stars depending on restaurant's rating
+        if (restaurant.getRating() < 5.0 / 4.0 * 3.0)
+            restaurantStar3.setVisibility(View.GONE);
+        else if (restaurant.getRating() < 5.0 / 4.0 * 2.0)
+            restaurantStar2.setVisibility(View.GONE);
+        else if (restaurant.getRating() < 5.0 / 4.0)
+            restaurantStar1.setVisibility(View.GONE);
+
+        // Set buttons
+        setCallButton(restaurant);
+        setWebsiteButton(restaurant);
+
+    }
 
 
+    // Set call button
+    private void setCallButton(Restaurant restaurant) {
+
+        callButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (restaurant.getPhoneNumber() != null) {
+
+                    Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                    callIntent.setData(Uri.parse("tel:" + restaurant.getPhoneNumber()));
+                    startActivity(callIntent);
+                } else {
+
+                    Toast.makeText(v.getContext(), "There's no phone number found for this restaurant", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 
 
+    // Set website button
+    private void setWebsiteButton(Restaurant restaurant) {
+
+        websiteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (restaurant.getWebsite() != null) {
+
+                    Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(restaurant.getWebsite()));
+                    startActivity(webIntent);
+                } else {
+
+                    Toast.makeText(v.getContext(), "There's no website found for this restaurant", Toast.LENGTH_SHORT).show();
+                }
 
 
+            }
+        });
     }
 
 
@@ -108,34 +170,6 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
 
         return workmateList;
 
-    }
-
-
-    // Execute HTTP request to retrieve details from a place
-    private void executePlacesDetailsRequest() {
-
-        String key = BuildConfig.google_apikey;
-        String placeId = getIntent().getStringExtra("ID");
-
-        this.disposable = GoogleAPIStreams.streamFetchPlacesDetails(key, placeId).subscribeWith(
-                new DisposableObserver<GooglePlacesDetails>() {
-
-                    @Override
-                    public void onNext(GooglePlacesDetails googlePlacesDetails) {
-
-                        updateData(googlePlacesDetails.getResult());
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
     }
 
 

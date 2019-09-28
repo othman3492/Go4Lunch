@@ -135,8 +135,8 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
     public void recyclerViewOnClick(int position) {
 
         Intent intent = new Intent(getActivity(), RestaurantDetailsActivity.class);
-        String placeId = restaurantList.get(position).getPlaceId();
-        intent.putExtra("ID", placeId);
+        Restaurant restaurant = restaurantList.get(position);
+        intent.putExtra("RESTAURANT", restaurant);
         startActivity(intent);
     }
 }
