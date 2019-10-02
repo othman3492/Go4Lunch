@@ -1,6 +1,7 @@
 package com.othman.go4lunch.controllers.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.models.GooglePlaces;
@@ -41,12 +43,20 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     TextView restaurantAddress;
     @BindView(R.id.restaurant_details_image)
     ImageView restaurantImage;
+    @BindView(R.id.floating_action_button)
+    FloatingActionButton floatingActionButton;
     @BindView(R.id.call_constraint_layout)
     View callButton;
+    @BindView(R.id.restaurant_details_call_button)
+    ImageView callButtonIcon;
     @BindView(R.id.like_constraint_layout)
     View likeButton;
+    @BindView(R.id.restaurant_details_like_button)
+    ImageView likeButtonIcon;
     @BindView(R.id.website_constraint_layout)
     View websiteButton;
+    @BindView(R.id.restaurant_details_website_button)
+    ImageView websiteButtonIcon;
     @BindView(R.id.restaurant_details_star_1)
     ImageView restaurantStar1;
     @BindView(R.id.restaurant_details_star_2)
@@ -66,6 +76,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_restaurant_details);
         ButterKnife.bind(this);
 
+        setIconColors();
         updateData();
 
         workmateList = new ArrayList<>();
@@ -110,19 +121,16 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     // Set call button
     private void setCallButton(Restaurant restaurant) {
 
-        callButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        callButton.setOnClickListener(v -> {
 
-                if (restaurant.getPhoneNumber() != null) {
+            if (restaurant.getPhoneNumber() != null) {
 
-                    Intent callIntent = new Intent(Intent.ACTION_DIAL);
-                    callIntent.setData(Uri.parse("tel:" + restaurant.getPhoneNumber()));
-                    startActivity(callIntent);
-                } else {
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                callIntent.setData(Uri.parse("tel:" + restaurant.getPhoneNumber()));
+                startActivity(callIntent);
+            } else {
 
-                    Toast.makeText(v.getContext(), "There's no phone number found for this restaurant", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(v.getContext(), "There's no phone number found for this restaurant", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -131,21 +139,18 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     // Set website button
     private void setWebsiteButton(Restaurant restaurant) {
 
-        websiteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        websiteButton.setOnClickListener(v -> {
 
-                if (restaurant.getWebsite() != null) {
+            if (restaurant.getWebsite() != null) {
 
-                    Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(restaurant.getWebsite()));
-                    startActivity(webIntent);
-                } else {
+                Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(restaurant.getWebsite()));
+                startActivity(webIntent);
+            } else {
 
-                    Toast.makeText(v.getContext(), "There's no website found for this restaurant", Toast.LENGTH_SHORT).show();
-                }
-
-
+                Toast.makeText(v.getContext(), "There's no website found for this restaurant", Toast.LENGTH_SHORT).show();
             }
+
+
         });
     }
 
@@ -176,6 +181,19 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     // Dispose subscription
     private void disposeWhenDestroy(){
         if (this.disposable != null && !this.disposable.isDisposed()) this.disposable.dispose();
+    }
+
+
+    // Set icon colors programmatically
+    private void setIconColors() {
+
+        restaurantStar1.setColorFilter(ContextCompat.getColor(this, R.color.white));
+        restaurantStar2.setColorFilter(ContextCompat.getColor(this, R.color.white));
+        restaurantStar3.setColorFilter(ContextCompat.getColor(this, R.color.white));
+        callButtonIcon.setColorFilter(ContextCompat.getColor(this, R.color.go4LunchThemeColor));
+        likeButtonIcon.setColorFilter(ContextCompat.getColor(this, R.color.go4LunchThemeColor));
+        websiteButtonIcon.setColorFilter(ContextCompat.getColor(this, R.color.go4LunchThemeColor));
+
     }
 
 

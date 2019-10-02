@@ -1,15 +1,18 @@
 package com.othman.go4lunch.controllers.activities;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.othman.go4lunch.R;
 
@@ -147,6 +150,24 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+
+    // Create new user in Firestore database
+    private void createUserInFirestore() {
+
+    }
+
+
+    // Show Toast message if Firestore return an error
+    protected OnFailureListener onFailureListener() {
+
+        return new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
+            }
+        };
     }
 }
 

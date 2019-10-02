@@ -1,5 +1,6 @@
 package com.othman.go4lunch.controllers.fragments;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.compat.GeoDataClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,8 +32,13 @@ import com.google.android.libraries.places.compat.PlaceDetectionClient;
 import com.google.android.libraries.places.compat.Places;
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
+import com.othman.go4lunch.controllers.activities.MainPageActivity;
 import com.othman.go4lunch.models.GooglePlaces;
+import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,6 +50,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @BindView(R.id.map_view)
     MapView mapView;
+
+    private ArrayList<Restaurant> restaurantList;
 
     private GoogleMap googleMap;
     private CameraPosition cameraPosition;
@@ -59,7 +68,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     // Last known location retrieved by the Fused Location Provider
     private Location lastKnownLocation;
-    private LatLng currentLocation;
+    private double currentLatitude;
+    private double currentLongitude;
 
     // Keys for storing fragment state
     private static final String KEY_CAMERA_POSITION = "camera_position";
@@ -129,13 +139,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         updateLocationUI();
         getDeviceLocation();
 
-        executeSearchNearbyPlacesRequest();
+        executeSearchNearbyPlacesRequest(map);
 
     }
 
 
     // Get current location of the device and position the map's camera
-    private LatLng getDeviceLocation() {
+    private void getDeviceLocation() {
 
         if (locationPermissionGranted) {
 
@@ -146,18 +156,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                     // Set the map's camera
                     lastKnownLocation = task.getResult();
+                    currentLatitude = lastKnownLocation.getLatitude();
+                    currentLongitude = lastKnownLocation.getLongitude();
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                            currentLocation = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                            new LatLng(currentLatitude, currentLongitude), DEFAULT_ZOOM));
                 }
             });
 
         } else {
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
             googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-            currentLocation = defaultLocation;
         }
-
-        return currentLocation;
     }
 
 
@@ -176,7 +185,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     // Check if permission is granted
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
 
         locationPermissionGranted = false;
 
@@ -209,16 +219,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
     // Execute HTTP request to retrieve nearby places
-    private void executeSearchNearbyPlacesRequest() {
+    private void executeSearchNearbyPlacesRequest(GoogleMap map) {
 
         String type = "restaurant";
-        String location = "43.4722515,3.7749125";
+        String location = "43.472,3.774";
         String key = BuildConfig.google_apikey;
 
         this.disposable = GoogleAPIStreams.streamFetchPlaces(key, type, location, 2000).subscribeWith(
                 new DisposableObserver<GooglePlaces>() {
                     @Override
                     public void onNext(GooglePlaces googlePlaces) {
+
+                        setMarkersOnMap(map, createRestaurantList(googlePlaces.getResults()));
 
                         Log.e("TAG", "On Next");
                     }
@@ -233,8 +245,50 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     @Override
                     public void onComplete() {
 
+
                         Log.e("TAG", "On Complete");
                     }
                 });
     }
+
+
+    // Create a list of Restaurant objects from the API request results
+    private List<Restaurant> createRestaurantList(List<GooglePlaces.Result> results) {
+
+        List<Restaurant> restaurantList = new ArrayList<>();
+
+        for (GooglePlaces.Result result : results) {
+
+            Restaurant restaurant = new Restaurant().createRestaurantfromAPIResults(result);
+            restaurantList.add(restaurant);
+        }
+
+        return restaurantList;
+
+    }
+
+
+    // Set markers on map for all restaurants
+    private void setMarkersOnMap(GoogleMap map, List<Restaurant> restaurantList) {
+
+        this.restaurantList = new ArrayList<>();
+        this.restaurantList.addAll(restaurantList);
+
+        for (Restaurant restaurant : restaurantList) {
+
+            Marker marker = map.addMarker(new MarkerOptions()
+                    .position(new LatLng(restaurant.getLatitude(), restaurant.getLongitude()))
+                    .title(restaurant.getName()));
+        }
+    }
+
+    // Get current latitude and longitude to use them in ListFragment's request
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        ListFragment.setParameters(currentLatitude, currentLongitude);
+    }
+
+
 }

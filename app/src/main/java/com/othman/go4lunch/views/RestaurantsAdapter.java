@@ -78,10 +78,14 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
         ImageView restaurantWorkmates;
         @BindView(R.id.restaurant_star_1)
         ImageView restaurantStar1;
+        @BindView(R.id.restaurant_star_2)
+        ImageView restaurantStar2;
+        @BindView(R.id.restaurant_star_3)
+        ImageView restaurantStar3;
         @BindView(R.id.restaurant_name)
         TextView restaurantName;
-        @BindView(R.id.restaurant_type_and_address)
-        TextView restaurantTypeAndAddress;
+        @BindView(R.id.restaurant_address)
+        TextView restaurantAddress;
         @BindView(R.id.restaurant_hours)
         TextView restaurantHours;
         @BindView(R.id.restaurant_distance)
@@ -106,18 +110,31 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
         void populateViewHolder(Restaurant restaurant) {
 
             restaurantName.setText(restaurant.getName());
-            restaurantTypeAndAddress.setText(restaurant.getType() + " - " + restaurant.getAddress());
+            restaurantAddress.setText(restaurant.getAddress());
             restaurantWorkmatesNumber.setText("3");
 
-            if (restaurant.isOpenNow()) {
-                restaurantHours.setText(R.string.open);
-                restaurantHours.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.Open));
-            } else {
-                restaurantHours.setText(R.string.closed);
-                restaurantHours.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.Closed));
+
+            // Set text depending on restaurant's opening hours
+            if (restaurant.getOpenNow() == null) {
+                restaurantHours.setText(R.string.no_hours);
+            } else if (restaurant.getOpenNow().equals("true")) {
+                    restaurantHours.setText(R.string.open);
+                    restaurantHours.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.Open));
+                } else {
+                    restaurantHours.setText(R.string.closed);
+                    restaurantHours.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.Closed));
             }
 
+            // Set restaurant image
             Picasso.get().load(restaurant.getImageUrl()).into(restaurantImage);
+
+            // Display stars depending on restaurant's rating
+            if (restaurant.getRating() < 5.0 / 4.0 * 3.0)
+                restaurantStar3.setVisibility(View.GONE);
+            else if (restaurant.getRating() < 5.0 / 4.0 * 2.0)
+                restaurantStar2.setVisibility(View.GONE);
+            else if (restaurant.getRating() < 5.0 / 4.0)
+                restaurantStar1.setVisibility(View.GONE);
 
 
         }

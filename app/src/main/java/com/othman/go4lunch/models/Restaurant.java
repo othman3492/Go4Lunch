@@ -15,30 +15,16 @@ public class Restaurant implements Serializable {
     private String type;
     private String address;
     private double rating;
+    private double latitude;
+    private double longitude;
     private int radius;
     private String phoneNumber;
     private String website;
-    private boolean isOpenNow;
+    private String isOpenNow;
     private String imageUrl;
     private String placeId;
 
     private Disposable disposable;
-
-    public String getPlaceId() {
-        return placeId;
-    }
-
-    public void setPlaceId(String placeId) {
-        this.placeId = placeId;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
 
     public Restaurant() {
 
@@ -85,9 +71,7 @@ public class Restaurant implements Serializable {
         this.radius = radius;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
+    public String getPhoneNumber() { return phoneNumber; }
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
@@ -101,20 +85,43 @@ public class Restaurant implements Serializable {
         this.website = website;
     }
 
-
-    public boolean isOpenNow() {
+    public String getOpenNow() {
         return isOpenNow;
     }
 
-    public void setOpenNow(boolean openNow) {
+    public void setOpenNow(String openNow) {
         isOpenNow = openNow;
     }
 
+    public double getLatitude() { return latitude; }
 
-    // Create a Restaurant object and fill it with data from the result object
+    public void setLatitude(double latitude) { this.latitude = latitude; }
+
+    public double getLongitude() { return longitude; }
+
+    public void setLongitude(double longitude) { this.longitude = longitude; }
+
+    public String getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+
+    // Create a Restaurant object and fill it with data from Search Results and Details Results
     public Restaurant createRestaurantfromAPIResults(GooglePlaces.Result result) {
 
-        String imageBaseUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=75&maxheight=75&photoreference=";
+        String imageBaseUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&maxheight=100&photoreference=";
 
         Restaurant restaurant = new Restaurant();
 
@@ -122,9 +129,13 @@ public class Restaurant implements Serializable {
         restaurant.type = result.getTypes().get(0);
         restaurant.address = result.getVicinity();
         restaurant.placeId = result.getPlaceId();
+        restaurant.latitude = result.getGeometry().getLocation().getLat();
+        restaurant.longitude = result.getGeometry().getLocation().getLng();
 
-        if (result.getOpeningHours() != null)
-            restaurant.isOpenNow = result.getOpeningHours().getOpenNow();
+        if (result.getOpeningHours() != null) {
+            restaurant.isOpenNow = result.getOpeningHours().getOpenNow().toString();
+        }
+
 
         if (result.getPhotos() != null)
             restaurant.imageUrl = imageBaseUrl + result.getPhotos().get(0).getPhotoReference()
@@ -165,6 +176,7 @@ public class Restaurant implements Serializable {
     }
 
 
+    // Complete restaurant object with data from Details Request
     private void addDataFromDetailsRequest(Restaurant restaurant, GooglePlacesDetails.Result result) {
 
         restaurant.rating = result.getRating();

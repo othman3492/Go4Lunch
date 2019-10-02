@@ -38,6 +38,8 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
     private List<Restaurant> restaurantList;
     private RestaurantsAdapter adapter;
     private Disposable disposable;
+    static double currentLatitude;
+    static double currentLongitude;
 
 
     public ListFragment() {
@@ -52,6 +54,7 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
         View v =  inflater.inflate(R.layout.fragment_restaurants_list, container, false);
 
         restaurantList = new ArrayList<>();
+        setParameters(currentLatitude, currentLongitude);
 
         executeSearchNearbyPlacesRequest();
 
@@ -79,8 +82,8 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
 
         for (GooglePlaces.Result result : results) {
 
-            Restaurant article = new Restaurant().createRestaurantfromAPIResults(result);
-            restaurantList.add(article);
+            Restaurant restaurant = new Restaurant().createRestaurantfromAPIResults(result);
+            restaurantList.add(restaurant);
         }
 
         return restaurantList;
@@ -96,12 +99,19 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
     }
 
 
+    // Get location parameters from MapFragment to use them in the request
+    public static void setParameters(double latitude, double longitude) {
+
+        currentLatitude = latitude;
+        currentLongitude = longitude;
+    }
+
 
     // Execute HTTP request to retrieve nearby places
     private void executeSearchNearbyPlacesRequest() {
 
         String type = "restaurant";
-        String location = "43.4722515,3.7749125";
+        String location = currentLatitude + "," + currentLongitude;
         String key = BuildConfig.google_apikey;
 
         this.disposable = GoogleAPIStreams.streamFetchPlaces(key, type, location, 5000).subscribeWith(

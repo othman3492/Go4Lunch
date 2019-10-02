@@ -14,6 +14,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -70,11 +71,11 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
     // Get data from current user
     @Nullable
-    protected FirebaseUser getCurrentUser() {
+    public FirebaseUser getCurrentUser() {
         return FirebaseAuth.getInstance().getCurrentUser();
     }
 
-    protected boolean isUserLogged() {
+    public boolean isUserLogged() {
         return (this.getCurrentUser() != null);
     }
 
@@ -150,6 +151,8 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
                 startActivity(intent);
                 break;
             case R.id.main_page_drawer_settings:
+                Intent settingsIntent = new Intent(MainPageActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 break;
             // Sign out from app
             case R.id.main_page_drawer_logout:
@@ -209,7 +212,6 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
         return aVoid -> finish();
     }
-
 }
 
 
