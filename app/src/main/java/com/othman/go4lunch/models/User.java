@@ -23,9 +23,8 @@ public class User {
         this.urlPicture = urlPicture;
     }
 
-    public Restaurant getRestaurant() {
-        return restaurant;
-    }
+
+    public Restaurant getRestaurant() { return restaurant; }
 
     public void setRestaurant(Restaurant restaurant) { this.restaurant = restaurant; }
 
@@ -53,7 +52,6 @@ public class User {
     public void setUrlPicture(@Nullable String urlPicture) {
         this.urlPicture = urlPicture;
     }
-
 
     public String getRestaurantId() { return restaurantId; }
 

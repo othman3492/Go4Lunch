@@ -15,14 +15,14 @@
             android:name=".controllers.activities.SettingsActivity"
             android:label="@string/title_activity_settings"></activity>
         <activity android:name=".controllers.activities.RestaurantDetailsActivity" />
-        <activity android:name=".controllers.activities.MainPageActivity">
+        <activity android:name=".controllers.activities.MainPageActivity"/>
+        <activity android:name=".controllers.activities.LoginActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
         </activity>
-        <activity android:name=".controllers.activities.LoginActivity" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

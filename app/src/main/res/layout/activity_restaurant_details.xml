@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:src="@drawable/baseline_restaurant_24"
+        app:backgroundTint="@color/white"
         app:layout_constraintTop_toBottomOf="@id/restaurant_details_image"
         app:layout_constraintBottom_toTopOf="@id/name_constraint_layout"
         app:layout_constraintEnd_toEndOf="@id/restaurant_details_image"/>

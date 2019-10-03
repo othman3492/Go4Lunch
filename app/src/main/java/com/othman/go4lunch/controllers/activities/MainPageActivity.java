@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -30,10 +31,15 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.controllers.fragments.ListFragment;
 import com.othman.go4lunch.controllers.fragments.MapFragment;
 import com.othman.go4lunch.controllers.fragments.WorkmatesFragment;
+import com.othman.go4lunch.models.Restaurant;
+import com.othman.go4lunch.models.User;
+import com.othman.go4lunch.utils.UserHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -147,9 +153,9 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
             // Open restaurant details
             case R.id.main_page_drawer_lunch:
-                Intent intent = new Intent(MainPageActivity.this, RestaurantDetailsActivity.class);
-                startActivity(intent);
+                startChosenRestaurantDetailsActivity();
                 break;
+            // Open SettingsActivity
             case R.id.main_page_drawer_settings:
                 Intent settingsIntent = new Intent(MainPageActivity.this, SettingsActivity.class);
                 startActivity(settingsIntent);
@@ -162,6 +168,29 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
 
         return false;
+    }
+
+
+    // Start selected RestaurantDetailsActivity
+    private void startChosenRestaurantDetailsActivity() {
+
+        UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                User currentUser = documentSnapshot.toObject(User.class);
+
+                Restaurant restaurant = currentUser.getRestaurant();
+
+                if (restaurant != null) {
+                    Intent intent = new Intent(MainPageActivity.this, RestaurantDetailsActivity.class);
+                    intent.putExtra("RESTAURANT", restaurant);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getApplicationContext(), getString(R.string.no_restaurant_selected), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
 
@@ -189,14 +218,24 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
                         .into(headerUserImage);
             }
 
-            // Get username and email from Firebase, and update views
-            String username = TextUtils.isEmpty(getCurrentUser().getDisplayName()) ?
-                    getString(R.string.no_username_found) : this.getCurrentUser().getDisplayName();
-            String email = TextUtils.isEmpty(getCurrentUser().getEmail()) ?
-                    getString(R.string.no_email_found) : this.getCurrentUser().getEmail();
+            // Get data from Firebase, and update views
+            UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-            headerUserName.setText(username);
-            headerUserEmail.setText(email);
+                    User currentUser = documentSnapshot.toObject(User.class);
+
+                    String username = TextUtils.isEmpty(getCurrentUser().getDisplayName()) ?
+                            getString(R.string.no_username_found) : FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+                    String email = TextUtils.isEmpty(getCurrentUser().getEmail()) ?
+                            getString(R.string.no_email_found) : FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+                    headerUserName.setText(username);
+                    headerUserEmail.setText(email);
+
+                }
+            });
         }
 
     }
@@ -210,7 +249,12 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
     private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted() {
 
-        return aVoid -> finish();
+        return new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                MainPageActivity.this.finish();
+            }
+        };
     }
 }
 

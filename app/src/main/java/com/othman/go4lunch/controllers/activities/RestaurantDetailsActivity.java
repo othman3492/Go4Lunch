@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +17,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.models.GooglePlaces;
@@ -23,6 +27,7 @@ import com.othman.go4lunch.models.GooglePlacesDetails;
 import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.models.Workmate;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
+import com.othman.go4lunch.utils.UserHelper;
 import com.othman.go4lunch.views.WorkmatesAdapter;
 import com.squareup.picasso.Picasso;
 
@@ -65,7 +70,6 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     ImageView restaurantStar3;
 
 
-
     private List<Workmate> workmateList;
     private WorkmatesAdapter adapter;
     private Disposable disposable;
@@ -86,7 +90,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
 
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         this.disposeWhenDestroy();
     }
@@ -112,90 +116,110 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
             restaurantStar1.setVisibility(View.GONE);
 
         // Set buttons
+        setFloatingActionButton(restaurant);
         setCallButton(restaurant);
         setWebsiteButton(restaurant);
 
     }
 
 
-    // Set call button
-    private void setCallButton(Restaurant restaurant) {
+    // Set floating action button
+    private void setFloatingActionButton(Restaurant restaurant) {
 
-        callButton.setOnClickListener(v -> {
+        boolean isClicked = false;
 
-            if (restaurant.getPhoneNumber() != null) {
+        // Update chosen restaurant and change button color if success
+        floatingActionButton.setOnClickListener(v -> {
 
-                Intent callIntent = new Intent(Intent.ACTION_DIAL);
-                callIntent.setData(Uri.parse("tel:" + restaurant.getPhoneNumber()));
-                startActivity(callIntent);
-            } else {
 
-                Toast.makeText(v.getContext(), "There's no phone number found for this restaurant", Toast.LENGTH_SHORT).show();
+                    UserHelper.updateChosenRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), restaurant)
+                            .addOnSuccessListener(aVoid -> {
+
+                                floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getResources()
+                                        .getColor(R.color.quantum_vanillagreen400)));
+                            });
+                });
+    }
+
+
+                // Set call button
+            private void setCallButton(Restaurant restaurant) {
+
+                callButton.setOnClickListener(v -> {
+
+                    if (restaurant.getPhoneNumber() != null) {
+
+                        Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                        callIntent.setData(Uri.parse("tel:" + restaurant.getPhoneNumber()));
+                        startActivity(callIntent);
+                    } else {
+
+                        Toast.makeText(v.getContext(), "There's no phone number found for this restaurant", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
-        });
-    }
 
 
-    // Set website button
-    private void setWebsiteButton(Restaurant restaurant) {
+            // Set website button
+            private void setWebsiteButton(Restaurant restaurant) {
 
-        websiteButton.setOnClickListener(v -> {
+                websiteButton.setOnClickListener(v -> {
 
-            if (restaurant.getWebsite() != null) {
+                    if (restaurant.getWebsite() != null) {
 
-                Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(restaurant.getWebsite()));
-                startActivity(webIntent);
-            } else {
+                        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(restaurant.getWebsite()));
+                        startActivity(webIntent);
+                    } else {
 
-                Toast.makeText(v.getContext(), "There's no website found for this restaurant", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(v.getContext(), "There's no website found for this restaurant", Toast.LENGTH_SHORT).show();
+                    }
+
+
+                });
             }
 
 
-        });
-    }
+            // Configure RecyclerView to display articles
+            private void configureRecyclerView() {
+
+                RecyclerView recyclerView = findViewById(R.id.restaurant_details_recycler_view);
+                this.adapter = new WorkmatesAdapter(this.workmateList);
+                recyclerView.setAdapter(adapter);
+                recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            }
 
 
-    // Configure RecyclerView to display articles
-    private void configureRecyclerView() {
+            private List<Workmate> addWorkmates() {
 
-        RecyclerView recyclerView = findViewById(R.id.restaurant_details_recycler_view);
-        this.adapter = new WorkmatesAdapter(this.workmateList);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-    }
+                workmateList.add(new Workmate());
+                workmateList.add(new Workmate());
+                workmateList.add(new Workmate());
+                workmateList.add(new Workmate());
+                workmateList.add(new Workmate());
 
+                return workmateList;
 
-    private List<Workmate> addWorkmates() {
-
-        workmateList.add(new Workmate());
-        workmateList.add(new Workmate());
-        workmateList.add(new Workmate());
-        workmateList.add(new Workmate());
-        workmateList.add(new Workmate());
-
-        return workmateList;
-
-    }
+            }
 
 
-    // Dispose subscription
-    private void disposeWhenDestroy(){
-        if (this.disposable != null && !this.disposable.isDisposed()) this.disposable.dispose();
-    }
+            // Dispose subscription
+            private void disposeWhenDestroy() {
+                if (this.disposable != null && !this.disposable.isDisposed())
+                    this.disposable.dispose();
+            }
 
 
-    // Set icon colors programmatically
-    private void setIconColors() {
+            // Set icon colors programmatically
+            private void setIconColors() {
 
-        restaurantStar1.setColorFilter(ContextCompat.getColor(this, R.color.white));
-        restaurantStar2.setColorFilter(ContextCompat.getColor(this, R.color.white));
-        restaurantStar3.setColorFilter(ContextCompat.getColor(this, R.color.white));
-        callButtonIcon.setColorFilter(ContextCompat.getColor(this, R.color.go4LunchThemeColor));
-        likeButtonIcon.setColorFilter(ContextCompat.getColor(this, R.color.go4LunchThemeColor));
-        websiteButtonIcon.setColorFilter(ContextCompat.getColor(this, R.color.go4LunchThemeColor));
+                restaurantStar1.setColorFilter(ContextCompat.getColor(this, R.color.white));
+                restaurantStar2.setColorFilter(ContextCompat.getColor(this, R.color.white));
+                restaurantStar3.setColorFilter(ContextCompat.getColor(this, R.color.white));
+                callButtonIcon.setColorFilter(ContextCompat.getColor(this, R.color.go4LunchThemeColor));
+                likeButtonIcon.setColorFilter(ContextCompat.getColor(this, R.color.go4LunchThemeColor));
+                websiteButtonIcon.setColorFilter(ContextCompat.getColor(this, R.color.go4LunchThemeColor));
 
-    }
+            }
 
 
-
-}
+        }

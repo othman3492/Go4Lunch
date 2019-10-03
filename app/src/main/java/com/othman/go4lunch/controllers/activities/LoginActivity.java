@@ -14,7 +14,10 @@ import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.othman.go4lunch.R;
+import com.othman.go4lunch.utils.UserHelper;
 
 import java.util.Arrays;
 
@@ -50,14 +53,17 @@ public class LoginActivity extends AppCompatActivity {
     public void onClickEmailLoginButton() {
         startEmailSignInActivity();
     }
+
     @OnClick(R.id.google_button)
     public void onClickGoogleLoginButton() {
         startGoogleSignInActivity();
     }
+
     @OnClick(R.id.facebook_button)
     public void onClickFacebookLoginButton() {
         startFacebookSignInActivity();
     }
+
     @OnClick(R.id.twitter_button)
     public void onClickTwitterLoginButton() {
         startTwitterSignInActivity();
@@ -71,9 +77,10 @@ public class LoginActivity extends AppCompatActivity {
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setAvailableProviders(Arrays.asList(
-                                        new AuthUI.IdpConfig.EmailBuilder().build()))
+                                new AuthUI.IdpConfig.EmailBuilder().build()))
                         .setIsSmartLockEnabled(false, true)
                         .build(), RC_SIGN_IN);
+
     }
 
     // Launch Google sign-in activity
@@ -86,6 +93,7 @@ public class LoginActivity extends AppCompatActivity {
                                 new AuthUI.IdpConfig.GoogleBuilder().build()))
                         .setIsSmartLockEnabled(false, true)
                         .build(), RC_SIGN_IN);
+
     }
 
     // Launch Facebook sign-in activity
@@ -98,6 +106,7 @@ public class LoginActivity extends AppCompatActivity {
                                 new AuthUI.IdpConfig.FacebookBuilder().build()))
                         .setIsSmartLockEnabled(false, true)
                         .build(), RC_SIGN_IN);
+
     }
 
     // Launch Twitter sign-in activity
@@ -110,8 +119,8 @@ public class LoginActivity extends AppCompatActivity {
                                 new AuthUI.IdpConfig.TwitterBuilder().build()))
                         .setIsSmartLockEnabled(false, true)
                         .build(), RC_SIGN_IN);
-    }
 
+    }
 
 
     @Override
@@ -123,7 +132,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     // Create a snackbar
-    private void showSnackbar (ConstraintLayout constraintLayout, String message) {
+    private void showSnackbar(ConstraintLayout constraintLayout, String message) {
 
         Snackbar.make(constraintLayout, message, Snackbar.LENGTH_SHORT).show();
     }
@@ -136,8 +145,9 @@ public class LoginActivity extends AppCompatActivity {
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                // Show message and start MainPageActivity
+                // Show message, create user and start MainPageActivity
                 showSnackbar(constraintLayout, getString(R.string.connection_succeed));
+                createUserInFirestore();
                 Intent intent = new Intent(LoginActivity.this, MainPageActivity.class);
                 startActivity(intent);
             } else {
@@ -153,21 +163,28 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    // Create new user in Firestore database
-    private void createUserInFirestore() {
+    // Get data from current user
+    @Nullable
+    public FirebaseUser getCurrentUser() {
+        return FirebaseAuth.getInstance().getCurrentUser();
+    }
 
+    public boolean isUserLogged() {
+        return (this.getCurrentUser() != null);
     }
 
 
-    // Show Toast message if Firestore return an error
-    protected OnFailureListener onFailureListener() {
+    // Create user in Firestore and store data
+    private void createUserInFirestore(){
 
-        return new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
-            }
-        };
+        if (this.getCurrentUser() != null){
+
+            String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
+            String username = this.getCurrentUser().getDisplayName();
+            String uid = this.getCurrentUser().getUid();
+
+            UserHelper.createUser(uid, username, urlPicture);
+        }
     }
 }
 
