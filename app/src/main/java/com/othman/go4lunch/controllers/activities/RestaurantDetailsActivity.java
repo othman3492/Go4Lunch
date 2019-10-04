@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,11 +21,13 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.models.GooglePlaces;
 import com.othman.go4lunch.models.GooglePlacesDetails;
 import com.othman.go4lunch.models.Restaurant;
+import com.othman.go4lunch.models.User;
 import com.othman.go4lunch.models.Workmate;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
 import com.othman.go4lunch.utils.UserHelper;
@@ -48,8 +51,10 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     TextView restaurantAddress;
     @BindView(R.id.restaurant_details_image)
     ImageView restaurantImage;
-    @BindView(R.id.floating_action_button)
-    FloatingActionButton floatingActionButton;
+    @BindView(R.id.check_floating_action_button)
+    FloatingActionButton checkFloatingActionButton;
+    @BindView(R.id.uncheck_floating_action_button)
+    FloatingActionButton uncheckFloatingActionButton;
     @BindView(R.id.call_constraint_layout)
     View callButton;
     @BindView(R.id.restaurant_details_call_button)
@@ -73,6 +78,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     private List<Workmate> workmateList;
     private WorkmatesAdapter adapter;
     private Disposable disposable;
+    private boolean isChecked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,29 +122,61 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
             restaurantStar1.setVisibility(View.GONE);
 
         // Set buttons
-        setFloatingActionButton(restaurant);
+        setFloatingActionButton(restaurant.getPlaceId());
         setCallButton(restaurant);
         setWebsiteButton(restaurant);
 
     }
 
 
-    // Set floating action button
-    private void setFloatingActionButton(Restaurant restaurant) {
+    // Set floating action buttons
+    private void setFloatingActionButton(String restaurant) {
 
-        boolean isClicked = false;
+        // Verify if restaurant is currently chosen, then set buttons state accordingly
+        UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-        // Update chosen restaurant and change button color if success
-        floatingActionButton.setOnClickListener(v -> {
+                User currentUser = documentSnapshot.toObject(User.class);
+                if (currentUser.getRestaurant() != null
+                        && currentUser.getRestaurant().equals(restaurant)) {
+
+                    checkFloatingActionButton.hide();
+                    uncheckFloatingActionButton.show();
+                } else {
+                    uncheckFloatingActionButton.hide();
+                    checkFloatingActionButton.show();
+                }
+            }
+        });
 
 
-                    UserHelper.updateChosenRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), restaurant)
-                            .addOnSuccessListener(aVoid -> {
+        // Add chosen restaurant to database and switch buttons
+        checkFloatingActionButton.setOnClickListener(v -> {
 
-                                floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getResources()
-                                        .getColor(R.color.quantum_vanillagreen400)));
-                            });
-                });
+            UserHelper.updateChosenRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), restaurant)
+                    .addOnSuccessListener(aVoid -> {
+
+                        checkFloatingActionButton.hide();
+                        uncheckFloatingActionButton.show();
+                        isChecked = true;
+                    });
+        });
+
+        // Remove restaurant from database and switch buttons
+        uncheckFloatingActionButton.setOnClickListener(v -> {
+
+
+            UserHelper.updateChosenRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), null)
+                    .addOnSuccessListener(aVoid -> {
+
+                        uncheckFloatingActionButton.hide();
+                        checkFloatingActionButton.show();
+                        isChecked = false;
+                    });
+        });
+
     }
 
 
@@ -212,7 +250,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
             // Set icon colors programmatically
             private void setIconColors() {
 
-                restaurantStar1.setColorFilter(ContextCompat.getColor(this, R.color.white));
+                restaurantStar1.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white), PorterDuff.Mode.MULTIPLY);
                 restaurantStar2.setColorFilter(ContextCompat.getColor(this, R.color.white));
                 restaurantStar3.setColorFilter(ContextCompat.getColor(this, R.color.white));
                 callButtonIcon.setColorFilter(ContextCompat.getColor(this, R.color.go4LunchThemeColor));

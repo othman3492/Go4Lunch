@@ -38,7 +38,7 @@ public class UserHelper {
         return UserHelper.getUsersCollection().document(uid).update("username", username);
     }
 
-    public static Task<Void> updateChosenRestaurant(String uid, Restaurant restaurant) {
+    public static Task<Void> updateChosenRestaurant(String uid, String restaurant) {
 
         return UserHelper.getUsersCollection().document(uid).update("restaurant", restaurant);
     }

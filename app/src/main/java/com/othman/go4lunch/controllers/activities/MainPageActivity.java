@@ -180,7 +180,7 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
                 User currentUser = documentSnapshot.toObject(User.class);
 
-                Restaurant restaurant = currentUser.getRestaurant();
+                String restaurant = currentUser.getRestaurant();
 
                 if (restaurant != null) {
                     Intent intent = new Intent(MainPageActivity.this, RestaurantDetailsActivity.class);

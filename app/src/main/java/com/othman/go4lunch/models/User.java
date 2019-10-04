@@ -7,8 +7,7 @@ public class User {
     private String userId;
     private String username;
     @Nullable private String urlPicture;
-    private Restaurant restaurant;
-    private String restaurantId;
+    private String restaurant;
 
 
     public User() {
@@ -24,9 +23,9 @@ public class User {
     }
 
 
-    public Restaurant getRestaurant() { return restaurant; }
+    public String getRestaurant() { return restaurant; }
 
-    public void setRestaurant(Restaurant restaurant) { this.restaurant = restaurant; }
+    public void setRestaurant(String restaurant) { this.restaurant = restaurant; }
 
     public String getUserId() {
         return userId;
@@ -53,7 +52,5 @@ public class User {
         this.urlPicture = urlPicture;
     }
 
-    public String getRestaurantId() { return restaurantId; }
 
-    public void setRestaurantId(String restaurantId) { this.restaurantId = restaurantId; }
 }

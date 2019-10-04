@@ -56,15 +56,15 @@ dependencies {
 
 
     //ButterKnife
-    implementation 'com.jakewharton:butterknife:10.1.0'
+    implementation 'com.jakewharton:butterknife:10.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.preference:preference:1.1.0-alpha05'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
+    implementation 'androidx.preference:preference:1.1.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.0'
 
     // Firebase & FirebaseUI libraries
     implementation 'com.google.firebase:firebase-analytics:17.2.0'
     implementation 'com.google.firebase:firebase-core:17.2.0'
-    implementation 'com.google.firebase:firebase-inappmessaging:19.0.0'
+    implementation 'com.google.firebase:firebase-inappmessaging:19.0.1'
     implementation 'com.firebaseui:firebase-ui-auth:5.1.0'
     implementation 'com.firebaseui:firebase-ui-database:5.1.0'
     implementation 'com.firebaseui:firebase-ui-storage:5.1.0'
@@ -82,9 +82,9 @@ dependencies {
     // Retrofit & RXJava2/RXAndroid libraries
     implementation 'io.reactivex.rxjava2:rxjava:2.1.14'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.6.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.4.1'
     implementation 'com.squareup.retrofit2:converter-scalars:2.1.0'
 
@@ -92,9 +92,19 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
 
 
+    // Test libraries
     testImplementation 'junit:junit:4.12'
+    implementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
     androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
+    androidTestImplementation ('androidx.test.espresso:espresso-core:3.1.1', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    androidTestImplementation ('androidx.test.espresso:espresso-contrib:3.1.1') {
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+    }
 }
 
 apply plugin: 'com.google.gms.google-services'
