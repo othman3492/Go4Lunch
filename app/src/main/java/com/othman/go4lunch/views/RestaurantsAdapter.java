@@ -129,11 +129,11 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
             Picasso.get().load(restaurant.getImageUrl()).into(restaurantImage);
 
             // Display stars depending on restaurant's rating
-            if (restaurant.getRating() < 5.0 / 4.0 * 3.0)
+            if (restaurant.getRating() < 4.0)
                 restaurantStar3.setVisibility(View.GONE);
-            else if (restaurant.getRating() < 5.0 / 4.0 * 2.0)
+            else if (restaurant.getRating() < 3.0)
                 restaurantStar2.setVisibility(View.GONE);
-            else if (restaurant.getRating() < 5.0 / 4.0)
+            else if (restaurant.getRating() < 2.0)
                 restaurantStar1.setVisibility(View.GONE);
 
 

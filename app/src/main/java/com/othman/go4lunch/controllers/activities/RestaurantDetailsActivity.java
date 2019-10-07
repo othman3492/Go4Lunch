@@ -30,6 +30,7 @@ import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.models.User;
 import com.othman.go4lunch.models.Workmate;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
+import com.othman.go4lunch.utils.RestaurantHelper;
 import com.othman.go4lunch.utils.UserHelper;
 import com.othman.go4lunch.views.WorkmatesAdapter;
 import com.squareup.picasso.Picasso;
@@ -86,7 +87,6 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_restaurant_details);
         ButterKnife.bind(this);
 
-        setIconColors();
         updateData();
 
         workmateList = new ArrayList<>();
@@ -114,11 +114,11 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
         Picasso.get().load(restaurant.getImageUrl()).into(restaurantImage);
 
         // Display stars depending on restaurant's rating
-        if (restaurant.getRating() < 5.0 / 4.0 * 3.0)
+        if (restaurant.getRating() < 4.0)
             restaurantStar3.setVisibility(View.GONE);
-        else if (restaurant.getRating() < 5.0 / 4.0 * 2.0)
+        else if (restaurant.getRating() < 3.0)
             restaurantStar2.setVisibility(View.GONE);
-        else if (restaurant.getRating() < 5.0 / 4.0)
+        else if (restaurant.getRating() < 2.0)
             restaurantStar1.setVisibility(View.GONE);
 
         // Set buttons
@@ -135,21 +135,21 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
         // Verify if restaurant is currently chosen, then set buttons state accordingly
         UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                User currentUser = documentSnapshot.toObject(User.class);
-                if (currentUser.getRestaurant() != null
-                        && currentUser.getRestaurant().equals(restaurant)) {
+                        User currentUser = documentSnapshot.toObject(User.class);
+                        if (currentUser.getRestaurant() != null
+                                && currentUser.getRestaurant().equals(restaurant)) {
 
-                    checkFloatingActionButton.hide();
-                    uncheckFloatingActionButton.show();
-                } else {
-                    uncheckFloatingActionButton.hide();
-                    checkFloatingActionButton.show();
-                }
-            }
-        });
+                            checkFloatingActionButton.hide();
+                            uncheckFloatingActionButton.show();
+                        } else {
+                            uncheckFloatingActionButton.hide();
+                            checkFloatingActionButton.show();
+                        }
+                    }
+                });
 
 
         // Add chosen restaurant to database and switch buttons
@@ -180,84 +180,83 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     }
 
 
-                // Set call button
-            private void setCallButton(Restaurant restaurant) {
+    // Set call button
+    private void setCallButton(Restaurant restaurant) {
 
-                callButton.setOnClickListener(v -> {
+        callButton.setOnClickListener(v -> {
 
-                    if (restaurant.getPhoneNumber() != null) {
+            if (restaurant.getPhoneNumber() != null) {
 
-                        Intent callIntent = new Intent(Intent.ACTION_DIAL);
-                        callIntent.setData(Uri.parse("tel:" + restaurant.getPhoneNumber()));
-                        startActivity(callIntent);
-                    } else {
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                callIntent.setData(Uri.parse("tel:" + restaurant.getPhoneNumber()));
+                startActivity(callIntent);
+            } else {
 
-                        Toast.makeText(v.getContext(), "There's no phone number found for this restaurant", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Toast.makeText(v.getContext(), "There's no phone number found for this restaurant", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    // Set like button
+    private void setLikeButton(Restaurant restaurant) {
+
+        likeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
+
+
+    // Set website button
+    private void setWebsiteButton(Restaurant restaurant) {
+
+        websiteButton.setOnClickListener(v -> {
+
+            if (restaurant.getWebsite() != null) {
+
+                Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(restaurant.getWebsite()));
+                startActivity(webIntent);
+            } else {
+
+                Toast.makeText(v.getContext(), "There's no website found for this restaurant", Toast.LENGTH_SHORT).show();
             }
 
 
-            // Set website button
-            private void setWebsiteButton(Restaurant restaurant) {
-
-                websiteButton.setOnClickListener(v -> {
-
-                    if (restaurant.getWebsite() != null) {
-
-                        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(restaurant.getWebsite()));
-                        startActivity(webIntent);
-                    } else {
-
-                        Toast.makeText(v.getContext(), "There's no website found for this restaurant", Toast.LENGTH_SHORT).show();
-                    }
+        });
+    }
 
 
-                });
-            }
+    // Configure RecyclerView to display articles
+    private void configureRecyclerView() {
+
+        RecyclerView recyclerView = findViewById(R.id.restaurant_details_recycler_view);
+        this.adapter = new WorkmatesAdapter(this.workmateList);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    }
 
 
-            // Configure RecyclerView to display articles
-            private void configureRecyclerView() {
+    private List<Workmate> addWorkmates() {
 
-                RecyclerView recyclerView = findViewById(R.id.restaurant_details_recycler_view);
-                this.adapter = new WorkmatesAdapter(this.workmateList);
-                recyclerView.setAdapter(adapter);
-                recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            }
+        workmateList.add(new Workmate());
+        workmateList.add(new Workmate());
+        workmateList.add(new Workmate());
+        workmateList.add(new Workmate());
+        workmateList.add(new Workmate());
 
+        return workmateList;
 
-            private List<Workmate> addWorkmates() {
-
-                workmateList.add(new Workmate());
-                workmateList.add(new Workmate());
-                workmateList.add(new Workmate());
-                workmateList.add(new Workmate());
-                workmateList.add(new Workmate());
-
-                return workmateList;
-
-            }
+    }
 
 
-            // Dispose subscription
-            private void disposeWhenDestroy() {
-                if (this.disposable != null && !this.disposable.isDisposed())
-                    this.disposable.dispose();
-            }
+    // Dispose subscription
+    private void disposeWhenDestroy() {
+        if (this.disposable != null && !this.disposable.isDisposed())
+            this.disposable.dispose();
+    }
 
 
-            // Set icon colors programmatically
-            private void setIconColors() {
-
-                restaurantStar1.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white), PorterDuff.Mode.MULTIPLY);
-                restaurantStar2.setColorFilter(ContextCompat.getColor(this, R.color.white));
-                restaurantStar3.setColorFilter(ContextCompat.getColor(this, R.color.white));
-                callButtonIcon.setColorFilter(ContextCompat.getColor(this, R.color.go4LunchThemeColor));
-                likeButtonIcon.setColorFilter(ContextCompat.getColor(this, R.color.go4LunchThemeColor));
-                websiteButtonIcon.setColorFilter(ContextCompat.getColor(this, R.color.go4LunchThemeColor));
-
-            }
-
-
-        }
+}

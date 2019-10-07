@@ -13,10 +13,13 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.othman.go4lunch.R;
+import com.othman.go4lunch.models.User;
 import com.othman.go4lunch.utils.UserHelper;
 
 import java.util.Arrays;
@@ -179,11 +182,23 @@ public class LoginActivity extends AppCompatActivity {
 
         if (this.getCurrentUser() != null){
 
-            String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
-            String username = this.getCurrentUser().getDisplayName();
-            String uid = this.getCurrentUser().getUid();
+            UserHelper.getUser(this.getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-            UserHelper.createUser(uid, username, urlPicture);
+                    User currentUser = documentSnapshot.toObject(User.class);
+                    if (!currentUser.getUsername().equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
+
+                        String urlPicture = (FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl() != null) ?
+                                FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString() : null;
+                        String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+                        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                        UserHelper.createUser(uid, username, urlPicture);
+                    }
+                }
+            });
+
         }
     }
 }

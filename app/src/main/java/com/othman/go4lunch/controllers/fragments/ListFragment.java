@@ -67,7 +67,7 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
     // Configure RecyclerView to display articles
     private void configureRecyclerView(View v) {
 
-        RecyclerView recyclerView = v.findViewById(R.id.workmates_recycler_view);
+        RecyclerView recyclerView = v.findViewById(R.id.restaurants_recycler_view);
         this.adapter = new RestaurantsAdapter(this.restaurantList, this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

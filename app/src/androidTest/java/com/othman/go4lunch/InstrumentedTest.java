@@ -24,7 +24,7 @@ public class InstrumentedTest {
     public void clickOnListView_opensListFragment() {
 
         onView(withId(R.id.bottom_list_view)).perform(click());
-        onView(withId(R.id.restaurant_name)).check(matches(isDisplayed()));
+        onView(withId(R.id.restaurants_recycler_view)).check(matches(isDisplayed()));
     }
 
 
@@ -32,36 +32,8 @@ public class InstrumentedTest {
     public void clickOnWorkmatesView_opensWorkmatesFragment() {
 
         onView(withId(R.id.bottom_workmates)).perform(click());
-        onView(withId(R.id.workmates_text_view)).check(matches(isDisplayed()));
+        onView(withId(R.id.workmates_recycler_view)).check(matches(isDisplayed()));
     }
-
-
-    @Test
-    public void clickOnYourLunchDrawer_opensRestaurantDetails() {
-
-        onView(withId(R.id.main_page_drawer_lunch)).perform(click());
-        onView(withId(R.id.floating_action_button)).check(matches(isDisplayed()));
-    }
-
-
-    @Test
-    public void clickOnSettingsDrawer_opensSettingsActivity() {
-
-        onView(withId(R.id.main_page_drawer_settings)).perform(click());
-        onView(withId(R.id.delete_button)).check(matches(isDisplayed()));
-    }
-
-
-    @Test
-    public void clickOnLogOutDrawer_opensRestaurantDetails() {
-
-        onView(withId(R.id.main_page_drawer_logout)).perform(click());
-        onView(withId(R.id.app_logo)).check(matches(isDisplayed()));
-    }
-
-
-
-
 
 
 }

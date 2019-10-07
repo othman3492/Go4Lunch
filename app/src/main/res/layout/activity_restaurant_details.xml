@@ -61,7 +61,7 @@
             app:layout_constraintBottom_toBottomOf="@id/restaurant_details_name"
             app:layout_constraintStart_toEndOf="@id/restaurant_details_name"
             app:layout_constraintTop_toTopOf="@id/restaurant_details_name"
-            android:background="@drawable/baseline_star_24"/>
+            android:background="@drawable/baseline_star_white_24"/>
 
         <ImageView
             android:id="@+id/restaurant_details_star_2"
@@ -71,7 +71,7 @@
             app:layout_constraintBottom_toBottomOf="@id/restaurant_details_name"
             app:layout_constraintStart_toEndOf="@id/restaurant_details_star_1"
             app:layout_constraintTop_toTopOf="@id/restaurant_details_name"
-            android:background="@drawable/baseline_star_24"/>
+            android:background="@drawable/baseline_star_white_24"/>
 
         <ImageView
             android:id="@+id/restaurant_details_star_3"
@@ -81,7 +81,7 @@
             app:layout_constraintBottom_toBottomOf="@id/restaurant_details_name"
             app:layout_constraintStart_toEndOf="@id/restaurant_details_star_2"
             app:layout_constraintTop_toTopOf="@id/restaurant_details_name"
-            android:background="@drawable/baseline_star_24"/>
+            android:background="@drawable/baseline_star_white_24"/>
 
         <TextView
             android:id="@+id/restaurant_details_name"
@@ -163,7 +163,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:background="@drawable/baseline_star_24" />
+            android:background="@drawable/baseline_star_color_24" />
 
         <TextView
             android:id="@+id/restaurant_details_like_button_text"

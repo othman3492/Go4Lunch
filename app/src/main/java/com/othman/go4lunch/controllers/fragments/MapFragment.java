@@ -68,6 +68,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     // Last known location retrieved by the Fused Location Provider
     private Location lastKnownLocation;
+    private LatLng currentLocation;
     private double currentLatitude;
     private double currentLongitude;
 
@@ -137,15 +138,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // Ask for permission, get location and set position of the map, then execute Nearby Places request
         getLocationPermission();
         updateLocationUI();
-        getDeviceLocation();
-
-        executeSearchNearbyPlacesRequest(map);
+        getDeviceLocation(map);
 
     }
 
 
     // Get current location of the device and position the map's camera
-    private void getDeviceLocation() {
+    private void getDeviceLocation(GoogleMap map) {
 
         if (locationPermissionGranted) {
 
@@ -160,6 +159,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     currentLongitude = lastKnownLocation.getLongitude();
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                             new LatLng(currentLatitude, currentLongitude), DEFAULT_ZOOM));
+
+                    executeSearchNearbyPlacesRequest(map);
                 }
             });
 
@@ -222,7 +223,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void executeSearchNearbyPlacesRequest(GoogleMap map) {
 
         String type = "restaurant";
-        String location = "43.472,3.774";
+        String location = currentLatitude +","+ currentLongitude;
         String key = BuildConfig.google_apikey;
 
         this.disposable = GoogleAPIStreams.streamFetchPlaces(key, type, location, 2000).subscribeWith(
@@ -279,6 +280,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Marker marker = map.addMarker(new MarkerOptions()
                     .position(new LatLng(restaurant.getLatitude(), restaurant.getLongitude()))
                     .title(restaurant.getName()));
+
         }
     }
 

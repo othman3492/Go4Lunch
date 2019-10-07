@@ -5,6 +5,7 @@ import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
 
 import java.io.Serializable;
+import java.util.List;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
@@ -23,11 +24,18 @@ public class Restaurant implements Serializable {
     private String isOpenNow;
     private String imageUrl;
     private String placeId;
+    private List<User> usersList;
 
     private Disposable disposable;
 
     public Restaurant() {
 
+    }
+
+
+    public Restaurant(String id) {
+
+        this.placeId = id;
     }
 
 
@@ -117,6 +125,21 @@ public class Restaurant implements Serializable {
         this.imageUrl = imageUrl;
     }
 
+    public String getIsOpenNow() {
+        return isOpenNow;
+    }
+
+    public void setIsOpenNow(String isOpenNow) {
+        this.isOpenNow = isOpenNow;
+    }
+
+    public List<User> getUsersList() {
+        return usersList;
+    }
+
+    public void setUsersList(List<User> usersList) {
+        this.usersList = usersList;
+    }
 
     // Create a Restaurant object and fill it with data from Search Results and Details Results
     public Restaurant createRestaurantfromAPIResults(GooglePlaces.Result result) {
