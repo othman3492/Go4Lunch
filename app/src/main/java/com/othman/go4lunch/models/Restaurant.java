@@ -1,6 +1,8 @@
 package com.othman.go4lunch.models;
 
 
+import android.location.Location;
+
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
 
@@ -18,7 +20,7 @@ public class Restaurant implements Serializable {
     private double rating;
     private double latitude;
     private double longitude;
-    private int radius;
+    private int distance;
     private String phoneNumber;
     private String website;
     private String isOpenNow;
@@ -71,14 +73,6 @@ public class Restaurant implements Serializable {
         this.rating = rating;
     }
 
-    public int getRadius() {
-        return radius;
-    }
-
-    public void setRadius(int radius) {
-        this.radius = radius;
-    }
-
     public String getPhoneNumber() { return phoneNumber; }
 
     public void setPhoneNumber(String phoneNumber) {
@@ -108,6 +102,10 @@ public class Restaurant implements Serializable {
     public double getLongitude() { return longitude; }
 
     public void setLongitude(double longitude) { this.longitude = longitude; }
+
+    public int getDistance() { return distance; }
+
+    public void setDistance(int distance) { this.distance = distance; }
 
     public String getPlaceId() {
         return placeId;
@@ -165,7 +163,7 @@ public class Restaurant implements Serializable {
                     + "&key=" + BuildConfig.google_apikey;
 
 
-        executePlacesDetailsRequest(restaurant, restaurant.placeId);
+        //executePlacesDetailsRequest(restaurant, restaurant.placeId);
 
 
         return restaurant;

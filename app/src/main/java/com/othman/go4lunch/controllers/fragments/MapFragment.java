@@ -33,9 +33,11 @@ import com.google.android.libraries.places.compat.Places;
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.controllers.activities.MainPageActivity;
+import com.othman.go4lunch.controllers.activities.RestaurantDetailsActivity;
 import com.othman.go4lunch.models.GooglePlaces;
 import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
+import com.othman.go4lunch.views.RestaurantsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -277,9 +279,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         for (Restaurant restaurant : restaurantList) {
 
-            Marker marker = map.addMarker(new MarkerOptions()
+            map.addMarker(new MarkerOptions()
                     .position(new LatLng(restaurant.getLatitude(), restaurant.getLongitude()))
                     .title(restaurant.getName()));
+
+            map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                @Override
+                public void onInfoWindowClick(Marker marker) {
+
+                    LatLng latLng = marker.getPosition();
+
+                    for (Restaurant restaurant : restaurantList) {
+
+                        if (latLng.equals(new LatLng(restaurant.getLatitude(), restaurant.getLongitude()))) {
+
+                            Intent intent = new Intent(getActivity(), RestaurantDetailsActivity.class);
+                            intent.putExtra("RESTAURANT", restaurant);
+                            startActivity(intent);
+                        }
+                    }
+                }
+            });
 
         }
     }

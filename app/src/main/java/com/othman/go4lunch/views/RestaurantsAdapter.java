@@ -112,6 +112,7 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
             restaurantName.setText(restaurant.getName());
             restaurantAddress.setText(restaurant.getAddress());
             restaurantWorkmatesNumber.setText("3");
+            restaurantDistance.setText(restaurant.getDistance() + " m");
 
 
             // Set text depending on restaurant's opening hours
@@ -136,7 +137,6 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
             else if (restaurant.getRating() < 2.0)
                 restaurantStar1.setVisibility(View.GONE);
 
-
         }
 
         @Override
@@ -145,6 +145,7 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
             recyclerViewOnClickListener.recyclerViewOnClick(getAdapterPosition());
 
         }
+
     }
 
 }

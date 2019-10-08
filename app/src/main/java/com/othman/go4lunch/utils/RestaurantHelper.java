@@ -4,6 +4,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.models.User;
 
@@ -31,10 +33,14 @@ public class RestaurantHelper {
         return RestaurantHelper.getRestaurantsCollection().document(id).get();
     }
 
+    public static Task<QuerySnapshot> getAllRestaurants() {
+
+        return RestaurantHelper.getRestaurantsCollection().get();
+    }
+
 
     // UPDATE RESTAURANT LIKES
     public static Task<Void> updateLike(Restaurant restaurant, User currentUser) {
-
 
         return RestaurantHelper.getRestaurantsCollection().document(restaurant.getPlaceId()).update("isLiked", true);
     }

@@ -2,6 +2,7 @@ package com.othman.go4lunch.controllers.fragments;
 
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,11 +14,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.controllers.activities.RestaurantDetailsActivity;
 import com.othman.go4lunch.models.GooglePlaces;
+import com.othman.go4lunch.models.GooglePlacesDetails;
 import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
 import com.othman.go4lunch.views.RestaurantsAdapter;
@@ -26,6 +29,7 @@ import com.othman.go4lunch.views.WorkmatesAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 
@@ -33,6 +37,10 @@ import io.reactivex.observers.DisposableObserver;
  * A simple {@link Fragment} subclass.
  */
 public class ListFragment extends Fragment implements RestaurantsAdapter.RecyclerViewOnClickListener {
+
+
+    @BindView(R.id.restaurant_distance)
+    TextView restaurantDistance;
 
 
     private List<Restaurant> restaurantList;
@@ -83,6 +91,10 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
         for (GooglePlaces.Result result : results) {
 
             Restaurant restaurant = new Restaurant().createRestaurantfromAPIResults(result);
+
+            executePlacesDetailsRequest(restaurant, restaurant.getPlaceId());
+
+            restaurant.setDistance(configureDistance(restaurant));
             restaurantList.add(restaurant);
         }
 
@@ -104,6 +116,24 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
 
         currentLatitude = latitude;
         currentLongitude = longitude;
+    }
+
+
+    // Calculate distance between user location and restaurant location
+    private int configureDistance(Restaurant restaurant) {
+
+        Location currentLocation = new Location ("CURRENT LOCATION");
+        Location restaurantLocation = new Location("RESTAURANT LOCATION");
+
+        currentLocation.setLatitude(currentLatitude);
+        currentLocation.setLongitude(currentLongitude);
+
+        restaurantLocation.setLatitude(restaurant.getLatitude());
+        restaurantLocation.setLongitude(restaurant.getLongitude());
+
+        int distance = (int) currentLocation.distanceTo(restaurantLocation);
+
+        return distance;
     }
 
 
@@ -135,6 +165,35 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
                     public void onComplete() {
 
                         Log.e("TAG", "On Complete");
+                    }
+                });
+    }
+
+
+    // Execute HTTP request to retrieve more information from the place
+    private void executePlacesDetailsRequest(Restaurant restaurant, String placeId) {
+
+        String key = BuildConfig.google_apikey;
+
+        this.disposable = GoogleAPIStreams.streamFetchPlacesDetails(key, placeId).subscribeWith(
+                new DisposableObserver<GooglePlacesDetails>() {
+
+                    @Override
+                    public void onNext(GooglePlacesDetails googlePlacesDetails) {
+
+                        restaurant.setRating(googlePlacesDetails.getResult().getRating());
+                        restaurant.setPhoneNumber(googlePlacesDetails.getResult().getFormattedPhoneNumber());
+                        restaurant.setWebsite(googlePlacesDetails.getResult().getWebsite());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
                     }
                 });
     }

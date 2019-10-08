@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +27,13 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,6 +47,9 @@ import com.othman.go4lunch.controllers.fragments.WorkmatesFragment;
 import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.models.User;
 import com.othman.go4lunch.utils.UserHelper;
+
+import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -58,6 +68,7 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
     BottomNavigationView bottomNavigationView;
 
     private Disposable disposable;
+    private final int AUTOCOMPLETE_REQUEST_CODE = 1;
 
 
     @Override
@@ -92,12 +103,33 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
         getMenuInflater().inflate(R.menu.main_page_menu, menu);
 
-        // Configure the SearchView
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.menu_activity_main_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setIconifiedByDefault(true);
         return true;
+    }
+
+
+    private void configureAutocompleteSupportFragment() {
+
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.TYPES));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                // TODO: Get info about the selected place.
+                Log.i("TAG", "Place: " + place.getName() + ", " + place.getId());
+            }
+
+            @Override
+            public void onError(Status status) {
+                // TODO: Handle the error.
+                Log.i("TAG", "An error occurred: " + status);
+            }
+        });
     }
 
 
@@ -144,6 +176,22 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
             return true;
         });
+    }
+
+
+    // Set search button to use Autocomplete
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.TYPES);
+
+        switch (item.getItemId()) {
+            case R.id.menu_activity_main_search :
+                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields).build(this);
+                startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

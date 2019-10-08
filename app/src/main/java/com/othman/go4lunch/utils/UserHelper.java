@@ -4,6 +4,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.models.User;
 
@@ -31,6 +32,11 @@ public class UserHelper {
         return UserHelper.getUsersCollection().document(uid).get();
     }
 
+    public static Task<QuerySnapshot> getAllUsers() {
+
+        return UserHelper.getUsersCollection().get();
+    }
+
 
     // UPDATE USER DATA
     public static Task<Void> updateUsername(String username, String uid) {
@@ -41,6 +47,11 @@ public class UserHelper {
     public static Task<Void> updateChosenRestaurant(String uid, String restaurant) {
 
         return UserHelper.getUsersCollection().document(uid).update("restaurant", restaurant);
+    }
+
+    public static Task<Void> updateNotificationChoice(String uid, boolean isEnabled) {
+
+        return UserHelper.getUsersCollection().document(uid).update("notifications", isEnabled);
     }
 
 

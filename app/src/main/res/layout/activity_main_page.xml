@@ -16,6 +16,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <fragment
+            android:id="@+id/autocomplete_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/main_page_toolbar"
