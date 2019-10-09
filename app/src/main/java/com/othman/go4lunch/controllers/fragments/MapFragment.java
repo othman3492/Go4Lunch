@@ -18,18 +18,17 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.compat.GeoDataClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.libraries.places.compat.PlaceDetectionClient;
-import com.google.android.libraries.places.compat.Places;
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.controllers.activities.MainPageActivity;
@@ -46,6 +45,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
+
+import static com.google.android.gms.location.places.Places.getGeoDataClient;
+import static com.google.android.gms.location.places.Places.getPlaceDetectionClient;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
@@ -99,8 +101,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, view);
 
-        geoDataClient = Places.getGeoDataClient(getContext(), null);
-        placeDetectionClient = Places.getPlaceDetectionClient(getContext(), null);
+        geoDataClient = getGeoDataClient(getContext());
+        placeDetectionClient = getPlaceDetectionClient(getContext());
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
 
@@ -310,6 +312,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         super.onDestroyView();
 
         ListFragment.setParameters(currentLatitude, currentLongitude);
+        MainPageActivity.setParameters(currentLatitude, currentLongitude);
     }
 
 

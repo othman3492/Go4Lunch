@@ -28,9 +28,15 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
 import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
@@ -40,6 +46,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.controllers.fragments.ListFragment;
 import com.othman.go4lunch.controllers.fragments.MapFragment;
@@ -50,6 +57,7 @@ import com.othman.go4lunch.utils.UserHelper;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -69,6 +77,8 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
     private Disposable disposable;
     private final int AUTOCOMPLETE_REQUEST_CODE = 1;
+    static double currentLatitude;
+    static double currentLongitude;
 
 
     @Override
@@ -78,6 +88,10 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
         ButterKnife.bind(this);
 
         setSupportActionBar(mainToolbar);
+
+        // Initialize Places SDK for Autocomplete
+        if (!Places.isInitialized())
+            Places.initialize(this, BuildConfig.google_apikey);
 
         // Configure UI
         updateUIWhenCreating();
@@ -107,32 +121,6 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
     }
 
 
-    private void configureAutocompleteSupportFragment() {
-
-        // Initialize the AutocompleteSupportFragment.
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-
-        // Specify the types of place data to return.
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.TYPES));
-
-        // Set up a PlaceSelectionListener to handle the response.
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(Place place) {
-                // TODO: Get info about the selected place.
-                Log.i("TAG", "Place: " + place.getName() + ", " + place.getId());
-            }
-
-            @Override
-            public void onError(Status status) {
-                // TODO: Handle the error.
-                Log.i("TAG", "An error occurred: " + status);
-            }
-        });
-    }
-
-
     private void configureDrawerLayout() {
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout,
@@ -142,6 +130,7 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
+
 
     // Set a back button in the toolbar
     public void onBackPressed() {
@@ -178,15 +167,22 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
         });
     }
 
-
     // Set search button to use Autocomplete
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.TYPES);
+        // Set list of needed data
+        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.TYPES, Place.Field.ADDRESS,
+                Place.Field.RATING, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI, Place.Field.PHOTO_METADATAS);
 
         switch (item.getItemId()) {
-            case R.id.menu_activity_main_search :
-                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields).build(this);
+            case R.id.menu_activity_main_search:
+
+                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
+                        .setLocationBias(RectangularBounds.newInstance(
+                                new LatLng(currentLatitude - 0.1, currentLongitude - 0.1),
+                                new LatLng(currentLatitude + 0.1, currentLongitude + 0.1)))
+                        .setTypeFilter(TypeFilter.ESTABLISHMENT)
+                        .build(this);
                 startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
                 return true;
             default:
@@ -195,116 +191,164 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
-        switch (menuItem.getItemId()) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-            // Open restaurant details
-            case R.id.main_page_drawer_lunch:
-                startChosenRestaurantDetailsActivity();
-                break;
-            // Open SettingsActivity
-            case R.id.main_page_drawer_settings:
-                Intent settingsIntent = new Intent(MainPageActivity.this, SettingsActivity.class);
-                startActivity(settingsIntent);
-                break;
-            // Sign out from app
-            case R.id.main_page_drawer_logout:
-                signOutFromFirebase();
-                break;
+        // Get place from Autocomplete Intent and create Restaurant from place data
+        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+
+                Place place = Autocomplete.getPlaceFromIntent(data);
+
+                Intent intent = new Intent(this, RestaurantDetailsActivity.class);
+                intent.putExtra("RESTAURANT", createRestaurantFromPlaceAutocomplete(place));
+                startActivity(intent);
+
+            }
+
+        } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+
+            Toast.makeText(this, R.string.error_unknown_error, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    // Create Restaurant object from Autocomplete Place object
+    private Restaurant createRestaurantFromPlaceAutocomplete(Place place) {
+
+        Restaurant restaurant = new Restaurant();
+
+        restaurant.setPlaceId(place.getId());
+        restaurant.setName(place.getName());
+        restaurant.setAddress(place.getAddress());
+        if (place.getWebsiteUri() != null) restaurant.setWebsite(place.getWebsiteUri().toString());
+        restaurant.setPhoneNumber(place.getPhoneNumber());
+        restaurant.setImageUrl(place.getPhotoMetadatas().get(0).getAttributions());
+
+        return restaurant;
+    }
+
+
+        @Override
+        public boolean onNavigationItemSelected (@NonNull MenuItem menuItem){
+
+            switch (menuItem.getItemId()) {
+
+                // Open restaurant details
+                case R.id.main_page_drawer_lunch:
+                    startChosenRestaurantDetailsActivity();
+                    break;
+                // Open SettingsActivity
+                case R.id.main_page_drawer_settings:
+                    Intent settingsIntent = new Intent(MainPageActivity.this, SettingsActivity.class);
+                    startActivity(settingsIntent);
+                    break;
+                // Sign out from app
+                case R.id.main_page_drawer_logout:
+                    signOutFromFirebase();
+                    break;
+            }
+
+
+            return false;
         }
 
 
-        return false;
-    }
+        // Start selected RestaurantDetailsActivity
+        private void startChosenRestaurantDetailsActivity () {
 
-
-    // Start selected RestaurantDetailsActivity
-    private void startChosenRestaurantDetailsActivity() {
-
-        UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                User currentUser = documentSnapshot.toObject(User.class);
-
-                String restaurant = currentUser.getRestaurant();
-
-                if (restaurant != null) {
-                    Intent intent = new Intent(MainPageActivity.this, RestaurantDetailsActivity.class);
-                    intent.putExtra("RESTAURANT", restaurant);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(getApplicationContext(), getString(R.string.no_restaurant_selected), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-
-    // Update UI when activity is creating
-    private void updateUIWhenCreating() {
-
-        // Display map fragment by default
-        Fragment fragment = new MapFragment();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
-
-        // Configure views if current user is not null
-        if (getCurrentUser() != null) {
-
-            View header = navigationView.getHeaderView(0);
-            ImageView headerUserImage = header.findViewById(R.id.header_user_image);
-            TextView headerUserName = header.findViewById(R.id.header_user_name);
-            TextView headerUserEmail = header.findViewById(R.id.header_user_email);
-
-            // Get user profile picture from Firebase
-            if (getCurrentUser().getPhotoUrl() != null) {
-
-                Glide.with(this)
-                        .load(getCurrentUser().getPhotoUrl())
-                        .apply(RequestOptions.circleCropTransform())
-                        .into(headerUserImage);
-            }
-
-            // Get data from Firebase, and update views
-            UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
 
                     User currentUser = documentSnapshot.toObject(User.class);
 
-                    String username = TextUtils.isEmpty(getCurrentUser().getDisplayName()) ?
-                            getString(R.string.no_username_found) : FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-                    String email = TextUtils.isEmpty(getCurrentUser().getEmail()) ?
-                            getString(R.string.no_email_found) : FirebaseAuth.getInstance().getCurrentUser().getEmail();
+                    String restaurant = currentUser.getRestaurant();
 
-                    headerUserName.setText(username);
-                    headerUserEmail.setText(email);
-
+                    if (restaurant != null) {
+                        Intent intent = new Intent(MainPageActivity.this, RestaurantDetailsActivity.class);
+                        intent.putExtra("RESTAURANT", restaurant);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(getApplicationContext(), getString(R.string.no_restaurant_selected), Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         }
 
-    }
 
+        // Update UI when activity is creating
+        private void updateUIWhenCreating () {
 
-    // Log out user and update UI
-    private void signOutFromFirebase() {
+            // Display map fragment by default
+            Fragment fragment = new MapFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
 
-        AuthUI.getInstance().signOut(this).addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted());
-    }
+            // Configure views if current user is not null
+            if (getCurrentUser() != null) {
 
-    private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted() {
+                View header = navigationView.getHeaderView(0);
+                ImageView headerUserImage = header.findViewById(R.id.header_user_image);
+                TextView headerUserName = header.findViewById(R.id.header_user_name);
+                TextView headerUserEmail = header.findViewById(R.id.header_user_email);
 
-        return new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                MainPageActivity.this.finish();
+                // Get user profile picture from Firebase
+                if (getCurrentUser().getPhotoUrl() != null) {
+
+                    Glide.with(this)
+                            .load(getCurrentUser().getPhotoUrl())
+                            .apply(RequestOptions.circleCropTransform())
+                            .into(headerUserImage);
+                }
+
+                // Get data from Firebase, and update views
+                UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                                User currentUser = documentSnapshot.toObject(User.class);
+
+                                String username = TextUtils.isEmpty(getCurrentUser().getDisplayName()) ?
+                                        getString(R.string.no_username_found) : FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+                                String email = TextUtils.isEmpty(getCurrentUser().getEmail()) ?
+                                        getString(R.string.no_email_found) : FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+                                headerUserName.setText(username);
+                                headerUserEmail.setText(email);
+
+                            }
+                        });
             }
-        };
+
+        }
+
+
+        // Log out user and update UI
+        private void signOutFromFirebase () {
+
+            AuthUI.getInstance().signOut(this).addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted());
+        }
+
+        private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted () {
+
+            return new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    MainPageActivity.this.finish();
+                }
+            };
+        }
+
+
+    // Get location parameters from MapFragment to use them in the request
+    public static void setParameters(double latitude, double longitude) {
+
+        currentLatitude = latitude;
+        currentLongitude = longitude;
     }
-}
+    }
 
 
 
