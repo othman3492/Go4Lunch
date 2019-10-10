@@ -12,44 +12,40 @@ import com.othman.go4lunch.models.User;
 public class RestaurantHelper {
 
 
-    private static final String COLLECTION_NAME = "restaurants";
 
     // COLLECTION REFERENCE
     public static CollectionReference getRestaurantsCollection() {
-        return FirebaseFirestore.getInstance().collection(COLLECTION_NAME);
+        return FirebaseFirestore.getInstance().collection("restaurants");
     }
 
-    // CREATE RESTAURANT
-    public static Task<Void> createRestaurant(String id) {
+    // CREATE
+    public static Task<Void> createLikedRestaurant(Restaurant restaurant, String userId) {
 
-        Restaurant restaurantToCreate = new Restaurant(id);
-        return RestaurantHelper.getRestaurantsCollection().document(id).set(restaurantToCreate);
-    }
-
-
-    // GET RESTAURANT
-    public static Task<DocumentSnapshot> getRestaurant(String id) {
-
-        return RestaurantHelper.getRestaurantsCollection().document(id).get();
-    }
-
-    public static Task<QuerySnapshot> getAllRestaurants() {
-
-        return RestaurantHelper.getRestaurantsCollection().get();
+        Restaurant toCreate = new Restaurant();
+        return UserHelper.getUsersCollection().document(userId)
+                .collection("restaurants").document(restaurant.getPlaceId()).set(toCreate);
     }
 
 
-    // UPDATE RESTAURANT LIKES
+    // GET
+    public static Task<QuerySnapshot> getAllRestaurantsForUser(String uid) {
+
+        return UserHelper.getUsersCollection().document(uid).collection("restaurants").get();
+    }
+
+
+    // UPDATE
     public static Task<Void> updateLike(Restaurant restaurant, User currentUser) {
 
         return RestaurantHelper.getRestaurantsCollection().document(restaurant.getPlaceId()).update("isLiked", true);
     }
 
 
-    // DELETE RESTAURANT
-    public static Task<Void> deleteRestaurant(String id) {
+    // DELETE
+    public static Task<Void> deleteLikedRestaurant(Restaurant restaurant, String userId) {
 
-        return RestaurantHelper.getRestaurantsCollection().document(id).delete();
+        return UserHelper.getUsersCollection().document(userId).collection("restaurants")
+                .document(restaurant.getPlaceId()).delete();
     }
 
 

@@ -6,8 +6,10 @@ public class User {
 
     private String userId;
     private String username;
-    @Nullable private String urlPicture;
-    private String restaurant;
+    @Nullable
+    private String urlPicture;
+    private Restaurant restaurant;
+    private boolean notificationsEnabled;
 
 
     public User() {
@@ -23,9 +25,13 @@ public class User {
     }
 
 
-    public String getRestaurant() { return restaurant; }
+    public Restaurant getRestaurant() {
+        return restaurant;
+    }
 
-    public void setRestaurant(String restaurant) { this.restaurant = restaurant; }
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
+    }
 
     public String getUserId() {
         return userId;
@@ -52,5 +58,11 @@ public class User {
         this.urlPicture = urlPicture;
     }
 
+    public boolean isNotificationsEnabled() {
+        return notificationsEnabled;
+    }
 
+    public void setNotificationsEnabled(boolean notifications) {
+        this.notificationsEnabled = notifications;
+    }
 }

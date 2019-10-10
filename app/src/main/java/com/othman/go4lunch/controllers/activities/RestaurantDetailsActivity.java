@@ -18,10 +18,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.models.GooglePlaces;
@@ -41,6 +45,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.exceptions.OnErrorNotImplementedException;
 import io.reactivex.observers.DisposableObserver;
 
 public class RestaurantDetailsActivity extends AppCompatActivity {
@@ -58,16 +63,12 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     FloatingActionButton uncheckFloatingActionButton;
     @BindView(R.id.call_constraint_layout)
     View callButton;
-    @BindView(R.id.restaurant_details_call_button)
-    ImageView callButtonIcon;
     @BindView(R.id.like_constraint_layout)
     View likeButton;
-    @BindView(R.id.restaurant_details_like_button)
-    ImageView likeButtonIcon;
+    @BindView(R.id.unlike_constraint_layout)
+    View unlikeButton;
     @BindView(R.id.website_constraint_layout)
     View websiteButton;
-    @BindView(R.id.restaurant_details_website_button)
-    ImageView websiteButtonIcon;
     @BindView(R.id.restaurant_details_star_1)
     ImageView restaurantStar1;
     @BindView(R.id.restaurant_details_star_2)
@@ -122,15 +123,16 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
             restaurantStar1.setVisibility(View.GONE);
 
         // Set buttons
-        setFloatingActionButton(restaurant.getPlaceId());
+        setFloatingActionButton(restaurant);
         setCallButton(restaurant);
+        setLikeButton(restaurant);
         setWebsiteButton(restaurant);
 
     }
 
 
     // Set floating action buttons
-    private void setFloatingActionButton(String restaurant) {
+    private void setFloatingActionButton(Restaurant restaurant) {
 
         // Verify if restaurant is currently chosen, then set buttons state accordingly
         UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -140,7 +142,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
 
                         User currentUser = documentSnapshot.toObject(User.class);
                         if (currentUser.getRestaurant() != null
-                                && currentUser.getRestaurant().equals(restaurant)) {
+                                && currentUser.getRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
 
                             checkFloatingActionButton.hide();
                             uncheckFloatingActionButton.show();
@@ -160,7 +162,6 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
 
                         checkFloatingActionButton.hide();
                         uncheckFloatingActionButton.show();
-                        isChecked = true;
                     });
         });
 
@@ -173,7 +174,6 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
 
                         uncheckFloatingActionButton.hide();
                         checkFloatingActionButton.show();
-                        isChecked = false;
                     });
         });
 
@@ -201,10 +201,57 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     // Set like button
     private void setLikeButton(Restaurant restaurant) {
 
+        // Verify if restaurant is currently chosen, then set buttons state accordingly
+        RestaurantHelper.getAllRestaurantsForUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                if (document.getData().toString().equals(restaurant.getPlaceId())) {
+                                    unlikeButton.setVisibility(View.VISIBLE);
+                                    likeButton.setVisibility(View.GONE);
+                                } else {
+                                    unlikeButton.setVisibility(View.GONE);
+                                    likeButton.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        }
+                    }
+                });
+
         likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                RestaurantHelper.createLikedRestaurant(restaurant, FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+
+                                likeButton.setVisibility(View.GONE);
+                                unlikeButton.setVisibility(View.VISIBLE);
+                            }
+                        });
+            }
+        });
+
+        unlikeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                RestaurantHelper.deleteLikedRestaurant(restaurant, FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+
+                                unlikeButton.setVisibility(View.GONE);
+                                likeButton.setVisibility(View.VISIBLE);
+                            }
+                        });
             }
         });
     }

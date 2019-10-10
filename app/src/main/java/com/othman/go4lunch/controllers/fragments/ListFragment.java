@@ -131,9 +131,7 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
         restaurantLocation.setLatitude(restaurant.getLatitude());
         restaurantLocation.setLongitude(restaurant.getLongitude());
 
-        int distance = (int) currentLocation.distanceTo(restaurantLocation);
-
-        return distance;
+        return (int) currentLocation.distanceTo(restaurantLocation);
     }
 
 
@@ -181,9 +179,8 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
                     @Override
                     public void onNext(GooglePlacesDetails googlePlacesDetails) {
 
-                        restaurant.setRating(googlePlacesDetails.getResult().getRating());
-                        restaurant.setPhoneNumber(googlePlacesDetails.getResult().getFormattedPhoneNumber());
-                        restaurant.setWebsite(googlePlacesDetails.getResult().getWebsite());
+
+
                     }
 
                     @Override

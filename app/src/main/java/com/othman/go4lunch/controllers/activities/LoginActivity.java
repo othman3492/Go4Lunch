@@ -180,7 +180,14 @@ public class LoginActivity extends AppCompatActivity {
     // Create user in Firestore and store data
     private void createUserInFirestore(){
 
-        if (this.getCurrentUser() != null){
+        String urlPicture = (FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl() != null) ?
+                FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString() : null;
+        String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        UserHelper.createUser(uid, username, urlPicture);
+
+        /*if (this.getCurrentUser() != null){
 
             UserHelper.getUser(this.getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
@@ -199,7 +206,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
 
-        }
+        }*/
     }
 }
 

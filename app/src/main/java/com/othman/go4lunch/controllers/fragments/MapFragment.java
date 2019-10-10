@@ -230,12 +230,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         String location = currentLatitude +","+ currentLongitude;
         String key = BuildConfig.google_apikey;
 
-        this.disposable = GoogleAPIStreams.streamFetchPlaces(key, type, location, 2000).subscribeWith(
+        this.disposable = GoogleAPIStreams.streamFetchPlaces(key, type, location, 5000).subscribeWith(
                 new DisposableObserver<GooglePlaces>() {
                     @Override
                     public void onNext(GooglePlaces googlePlaces) {
 
                         setMarkersOnMap(map, createRestaurantList(googlePlaces.getResults()));
+                        MainPageActivity.setParameters(currentLatitude, currentLongitude);
 
                         Log.e("TAG", "On Next");
                     }
@@ -312,7 +313,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         super.onDestroyView();
 
         ListFragment.setParameters(currentLatitude, currentLongitude);
-        MainPageActivity.setParameters(currentLatitude, currentLongitude);
     }
 
 

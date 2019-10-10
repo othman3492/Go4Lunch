@@ -15,7 +15,6 @@ import io.reactivex.observers.DisposableObserver;
 public class Restaurant implements Serializable {
 
     private String name;
-    private String type;
     private String address;
     private double rating;
     private double latitude;
@@ -47,14 +46,6 @@ public class Restaurant implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getAddress() {
@@ -147,7 +138,6 @@ public class Restaurant implements Serializable {
         Restaurant restaurant = new Restaurant();
 
         restaurant.name = result.getName();
-        restaurant.type = result.getTypes().get(0);
         restaurant.address = result.getVicinity();
         restaurant.placeId = result.getPlaceId();
         restaurant.latitude = result.getGeometry().getLocation().getLat();
@@ -163,7 +153,7 @@ public class Restaurant implements Serializable {
                     + "&key=" + BuildConfig.google_apikey;
 
 
-        //executePlacesDetailsRequest(restaurant, restaurant.placeId);
+        executePlacesDetailsRequest(restaurant, restaurant.placeId);
 
 
         return restaurant;
