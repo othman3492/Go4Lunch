@@ -3,6 +3,7 @@ package com.othman.go4lunch.controllers.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,8 +13,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.othman.go4lunch.R;
+import com.othman.go4lunch.models.User;
 import com.othman.go4lunch.models.Workmate;
+import com.othman.go4lunch.utils.UserHelper;
 import com.othman.go4lunch.views.WorkmatesAdapter;
 
 import java.util.ArrayList;
@@ -25,7 +32,7 @@ import java.util.List;
 public class WorkmatesFragment extends Fragment {
 
 
-    private List<Workmate> workmateList;
+    private List<User> workmateList;
     private WorkmatesAdapter adapter;
 
 
@@ -41,10 +48,8 @@ public class WorkmatesFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_workmates_list, container, false);
 
         workmateList = new ArrayList<>();
+        setWorkmatesList(v);
 
-        addWorkmates();
-
-        configureRecyclerView(v);
 
         return v;
     }
@@ -61,16 +66,23 @@ public class WorkmatesFragment extends Fragment {
     }
 
 
-    private List<Workmate> addWorkmates() {
+    private void setWorkmatesList(View v) {
 
-        workmateList.add(new Workmate());
-        workmateList.add(new Workmate());
-        workmateList.add(new Workmate());
-        workmateList.add(new Workmate());
-        workmateList.add(new Workmate());
+        UserHelper.getAllUsers().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-        return workmateList;
+                if (task.isSuccessful()) {
 
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+
+                        User createUser = document.toObject(User.class);
+                        workmateList.add(createUser);
+                    }
+
+                    configureRecyclerView(v);
+                }
+            }
+        });
     }
-
 }

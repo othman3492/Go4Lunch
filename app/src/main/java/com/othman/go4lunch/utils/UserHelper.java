@@ -4,13 +4,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.models.User;
 
-public class UserHelper {
+import java.util.List;
 
+
+public class UserHelper {
 
 
     // COLLECTION REFERENCE
@@ -19,9 +22,10 @@ public class UserHelper {
     }
 
     // CREATE
-    public static Task<Void> createUser(String uid, String username, String urlPicture) {
+    public static Task<Void> createUser(String uid, String username, String urlPicture, Restaurant restaurant,
+                                        List<Restaurant> likedRestaurants, boolean isEnabled) {
 
-        User userToCreate = new User(uid, username, urlPicture);
+        User userToCreate = new User(uid, username, urlPicture, restaurant, likedRestaurants, isEnabled);
         return UserHelper.getUsersCollection().document(uid).set(userToCreate);
     }
 
@@ -38,14 +42,14 @@ public class UserHelper {
     }
 
     // UPDATE
-    public static Task<Void> updateUsername(String username, String uid) {
+    public static Task<Void> addLikedRestaurant(String uid, Restaurant restaurant) {
 
-        return UserHelper.getUsersCollection().document(uid).update("username", username);
+        return UserHelper.getUsersCollection().document(uid).update("likedRestaurants", FieldValue.arrayUnion(restaurant));
     }
 
     public static Task<Void> updateChosenRestaurant(String uid, Restaurant restaurant) {
 
-        return UserHelper.getUsersCollection().document(uid).update("restaurant", restaurant);
+        return UserHelper.getUsersCollection().document(uid).update("chosenRestaurant", restaurant);
     }
 
     public static Task<Void> updateNotificationChoice(String uid, boolean isEnabled) {
@@ -55,6 +59,11 @@ public class UserHelper {
 
 
     // DELETE
+    public static Task<Void> removeLikedRestaurant(String uid, Restaurant restaurant) {
+
+        return UserHelper.getUsersCollection().document(uid).update("likedRestaurants", FieldValue.arrayRemove(restaurant));
+    }
+
     public static Task<Void> deleteUser(String uid) {
 
         return UserHelper.getUsersCollection().document(uid).delete();

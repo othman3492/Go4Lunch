@@ -186,7 +186,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintHorizontal_weight="1"
         android:padding="20dp"
-        android:visibility="gone"
+        android:visibility="invisible"
         android:background="@color/go4LunchThemeColor"
         app:layout_constraintTop_toTopOf="@id/call_constraint_layout"
         app:layout_constraintStart_toEndOf="@+id/call_constraint_layout"

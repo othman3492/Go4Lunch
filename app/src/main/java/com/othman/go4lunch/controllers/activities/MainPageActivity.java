@@ -217,6 +217,8 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
     // Create Restaurant object from Autocomplete Place object
     private Restaurant createRestaurantFromPlaceAutocomplete(Place place) {
 
+        String imageBaseUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&maxheight=100&photoreference=";
+
         Restaurant restaurant = new Restaurant();
 
         restaurant.setPlaceId(place.getId());
@@ -224,7 +226,9 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
         restaurant.setAddress(place.getAddress());
         if (place.getWebsiteUri() != null) restaurant.setWebsite(place.getWebsiteUri().toString());
         restaurant.setPhoneNumber(place.getPhoneNumber());
-        restaurant.setImageUrl(place.getPhotoMetadatas().get(0).getAttributions());
+
+        if (place.getPhotoMetadatas() != null)
+            restaurant.setImageUrl(imageBaseUrl + place.getPhotoMetadatas().get(0).zza() + "&key=" + BuildConfig.google_apikey);
 
         return restaurant;
     }
@@ -264,7 +268,7 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
                     User currentUser = documentSnapshot.toObject(User.class);
 
-                    Restaurant restaurant = currentUser.getRestaurant();
+                    Restaurant restaurant = currentUser.getChosenRestaurant();
 
                     if (restaurant != null) {
                         Intent intent = new Intent(MainPageActivity.this, RestaurantDetailsActivity.class);

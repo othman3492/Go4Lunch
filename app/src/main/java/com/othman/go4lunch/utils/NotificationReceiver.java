@@ -54,8 +54,10 @@ public class NotificationReceiver extends BroadcastReceiver {
 
                         User currentUser = documentSnapshot.toObject(User.class);
 
-                        restaurant = currentUser.getRestaurant().getName();
-                        address = currentUser.getRestaurant().getAddress();
+                        if (currentUser.getChosenRestaurant() != null) {
+                            restaurant = currentUser.getChosenRestaurant().getName();
+                            address = currentUser.getChosenRestaurant().getAddress();
+                        }
                     }
                 });
     }

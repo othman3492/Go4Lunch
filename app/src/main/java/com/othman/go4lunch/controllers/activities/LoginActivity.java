@@ -178,35 +178,27 @@ public class LoginActivity extends AppCompatActivity {
 
 
     // Create user in Firestore and store data
-    private void createUserInFirestore(){
+    private void createUserInFirestore() {
 
         String urlPicture = (FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl() != null) ?
                 FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString() : null;
         String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        UserHelper.createUser(uid, username, urlPicture);
+        UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-        /*if (this.getCurrentUser() != null){
+                User currentUser = documentSnapshot.toObject(User.class);
+                if (currentUser != null)
+                    UserHelper.createUser(uid, username, urlPicture, currentUser.getChosenRestaurant(),
+                            currentUser.getLikedRestaurants(), currentUser.isNotificationsEnabled());
+                else
+                    UserHelper.createUser(uid, username, urlPicture, null, null, false);
+            }
+        });
 
-            UserHelper.getUser(this.getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                    User currentUser = documentSnapshot.toObject(User.class);
-                    if (!currentUser.getUsername().equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
-
-                        String urlPicture = (FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl() != null) ?
-                                FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString() : null;
-                        String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-                        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-                        UserHelper.createUser(uid, username, urlPicture);
-                    }
-                }
-            });
-
-        }*/
     }
 }
 

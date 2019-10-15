@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.othman.go4lunch.R;
+import com.othman.go4lunch.models.User;
 import com.othman.go4lunch.models.Workmate;
 import com.squareup.picasso.Picasso;
 
@@ -29,10 +30,10 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.Work
     }
 
 
-    private final List<Workmate> workmatesList;
+    private final List<User> workmatesList;
 
 
-    public WorkmatesAdapter(List<Workmate> workmatesList) {
+    public WorkmatesAdapter(List<User> workmatesList) {
 
         this.workmatesList = workmatesList;
     }
@@ -79,12 +80,20 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.Work
 
 
         // Update UI with text and image
-        void populateViewHolder(Workmate workmate) {
+        void populateViewHolder(User workmate) {
 
 
-            workmateText.setText("Hello ! I'm your workmate.");
+            if (workmate.getChosenRestaurant() != null) {
+                workmateText.setText(workmate.getUsername() + " has chosen to go to " +  workmate.getChosenRestaurant().getName());
+            } else {
+                workmateText.setText(workmate.getUsername() + " has not chosen any restaurant today.");
+            }
 
-            Picasso.get().load(R.drawable.app_logo).into(workmateImage);
+            if (workmate.getUrlPicture() != null) {
+                Picasso.get().load(workmate.getUrlPicture()).into(workmateImage);
+            } else {
+                Picasso.get().load(R.drawable.blank_profile).into(workmateImage);
+            }
 
 
         }

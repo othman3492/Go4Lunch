@@ -2,13 +2,16 @@ package com.othman.go4lunch.models;
 
 import androidx.annotation.Nullable;
 
+import java.util.List;
+
 public class User {
 
     private String userId;
     private String username;
     @Nullable
     private String urlPicture;
-    private Restaurant restaurant;
+    private Restaurant chosenRestaurant;
+    private List<Restaurant> likedRestaurants;
     private boolean notificationsEnabled;
 
 
@@ -17,20 +20,32 @@ public class User {
     }
 
 
-    public User(String userId, String username, String urlPicture) {
+    public User(String userId, String username, String urlPicture, Restaurant restaurant,
+                List<Restaurant> likedRestaurants, boolean isEnabled) {
 
         this.userId = userId;
         this.username = username;
         this.urlPicture = urlPicture;
+        this.chosenRestaurant = restaurant;
+        this.likedRestaurants = likedRestaurants;
+        this.notificationsEnabled = isEnabled;
     }
 
 
-    public Restaurant getRestaurant() {
-        return restaurant;
+    public Restaurant getChosenRestaurant() {
+        return chosenRestaurant;
     }
 
-    public void setRestaurant(Restaurant restaurant) {
-        this.restaurant = restaurant;
+    public void setChosenRestaurant(Restaurant chosenRestaurant) {
+        this.chosenRestaurant = chosenRestaurant;
+    }
+
+    public List<Restaurant> getLikedRestaurants() {
+        return likedRestaurants;
+    }
+
+    public void setLikedRestaurants(List<Restaurant> likedRestaurants) {
+        this.likedRestaurants = likedRestaurants;
     }
 
     public String getUserId() {

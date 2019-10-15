@@ -86,4 +86,7 @@
     <string name="delete_account">DELETE ACCOUNT</string>
     <string name="no_restaurant_selected">There\'s no restaurant selected</string>
     <string name="unlike">UNLIKE</string>
+    <string name="is_joining">is joining !</string>
+    <string name="choice">has chosen</string>
+    <string name="no_choice">has not chosen any restaurant</string>
 </resources>
