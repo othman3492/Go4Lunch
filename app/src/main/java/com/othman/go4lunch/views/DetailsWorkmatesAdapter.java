@@ -77,8 +77,11 @@ public class DetailsWorkmatesAdapter extends RecyclerView.Adapter<DetailsWorkmat
 
             workmateText.setText(workmate.getUsername() + " is joining !");
 
-            Picasso.get().load(workmate.getUrlPicture()).into(workmateImage);
-
+            if (workmate.getUrlPicture() != null) {
+                Picasso.get().load(workmate.getUrlPicture()).into(workmateImage);
+            } else {
+                Picasso.get().load(R.drawable.blank_profile).into(workmateImage);
+            }
 
         }
     }

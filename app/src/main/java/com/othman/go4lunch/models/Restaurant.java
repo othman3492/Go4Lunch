@@ -133,7 +133,7 @@ public class Restaurant implements Serializable {
     // Create a Restaurant object and fill it with data from Search Results and Details Results
     public Restaurant createRestaurantfromAPIResults(GooglePlaces.Result result) {
 
-        String imageBaseUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&maxheight=100&photoreference=";
+        String imageBaseUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=300&maxheight=300&photoreference=";
 
         Restaurant restaurant = new Restaurant();
 

@@ -2,6 +2,7 @@ package com.othman.go4lunch.controllers.fragments;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -20,8 +21,10 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.PlaceDetectionClient;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,13 +32,18 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.controllers.activities.MainPageActivity;
 import com.othman.go4lunch.controllers.activities.RestaurantDetailsActivity;
 import com.othman.go4lunch.models.GooglePlaces;
 import com.othman.go4lunch.models.Restaurant;
+import com.othman.go4lunch.models.User;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
+import com.othman.go4lunch.utils.UserHelper;
 import com.othman.go4lunch.views.RestaurantsAdapter;
 
 import java.util.ArrayList;
@@ -227,7 +235,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void executeSearchNearbyPlacesRequest(GoogleMap map) {
 
         String type = "restaurant";
-        String location = currentLatitude +","+ currentLongitude;
+        String location = currentLatitude + "," + currentLongitude;
         String key = BuildConfig.google_apikey;
 
         this.disposable = GoogleAPIStreams.streamFetchPlaces(key, type, location, 5000).subscribeWith(
@@ -274,7 +282,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    // Set markers on map for all restaurants
+    // Set markers on map for all restaurants and set info windows on click to open RestaurantDetailsActivity
     private void setMarkersOnMap(GoogleMap map, List<Restaurant> restaurantList) {
 
         this.restaurantList = new ArrayList<>();
@@ -282,9 +290,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         for (Restaurant restaurant : restaurantList) {
 
-            map.addMarker(new MarkerOptions()
+            Marker marker = map.addMarker(new MarkerOptions()
                     .position(new LatLng(restaurant.getLatitude(), restaurant.getLongitude()))
                     .title(restaurant.getName()));
+
+            // Change marker color if another user has chosen the restaurant
+            UserHelper.getAllUsers().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            User createUser = document.toObject(User.class);
+
+                            if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) &&
+                                    createUser.getChosenRestaurant() != null &&
+                                    createUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
+
+                                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                            }
+                        }
+                    }
+                }
+            });
 
             map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                 @Override

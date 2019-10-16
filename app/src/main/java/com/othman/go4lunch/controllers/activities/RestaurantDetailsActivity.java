@@ -2,18 +2,12 @@ package com.othman.go4lunch.controllers.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,22 +18,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
-import com.othman.go4lunch.models.GooglePlaces;
-import com.othman.go4lunch.models.GooglePlacesDetails;
 import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.models.User;
-import com.othman.go4lunch.models.Workmate;
-import com.othman.go4lunch.utils.GoogleAPIStreams;
-import com.othman.go4lunch.utils.RestaurantHelper;
 import com.othman.go4lunch.utils.UserHelper;
 import com.othman.go4lunch.views.DetailsWorkmatesAdapter;
-import com.othman.go4lunch.views.WorkmatesAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -48,8 +34,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.exceptions.OnErrorNotImplementedException;
-import io.reactivex.observers.DisposableObserver;
 
 public class RestaurantDetailsActivity extends AppCompatActivity {
 
@@ -246,22 +230,22 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
             }
         });
 
-                unlikeButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+        unlikeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-                        UserHelper.removeLikedRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), restaurant)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
+                UserHelper.removeLikedRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), restaurant)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
 
-                                        unlikeButton.setVisibility(View.INVISIBLE);
-                                        likeButton.setVisibility(View.VISIBLE);
-                                    }
-                                });
-                    }
-                });
+                                unlikeButton.setVisibility(View.INVISIBLE);
+                                likeButton.setVisibility(View.VISIBLE);
+                            }
+                        });
             }
+        });
+    }
 
 
     // Set website button
@@ -303,15 +287,15 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         User createUser = document.toObject(User.class);
 
-                        if (createUser.getChosenRestaurant() != null
-                                && createUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId()))
+                        if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) &&
+                                createUser.getChosenRestaurant() != null
+                                && createUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
                             workmateList.add(createUser);
+                        }
                     }
                 }
             }
-
         });
-
     }
 
 

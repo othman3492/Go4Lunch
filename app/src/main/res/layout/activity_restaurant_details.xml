@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:contentDescription="@string/image_restaurant"
+        android:foregroundGravity="center"
         app:layout_constraintBottom_toTopOf="@id/name_constraint_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

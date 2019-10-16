@@ -15,11 +15,11 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.models.User;
-import com.othman.go4lunch.models.Workmate;
 import com.othman.go4lunch.utils.UserHelper;
 import com.othman.go4lunch.views.WorkmatesAdapter;
 
@@ -77,6 +77,8 @@ public class WorkmatesFragment extends Fragment {
                     for (QueryDocumentSnapshot document : task.getResult()) {
 
                         User createUser = document.toObject(User.class);
+
+                        if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
                         workmateList.add(createUser);
                     }
 

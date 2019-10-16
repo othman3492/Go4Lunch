@@ -29,7 +29,6 @@ public class RestaurantTest {
     private Restaurant restaurant;
 
 
-
     @Before
     public void setUp() {
 
@@ -49,7 +48,7 @@ public class RestaurantTest {
     }
 
 
-    @Test
+    /*@Test
     public void createRestaurantWithSuccess() {
 
         restaurant.setName(name);
@@ -96,8 +95,7 @@ public class RestaurantTest {
 
         Restaurant createRestaurant = restaurant.createRestaurantfromAPIResults(result);
 
-        assertEquals(restaurant.getName(), createRestaurant.getName());
-
-    }
+        assertEquals(restaurant.getName(), createRestaurant.getName());*/
 
 }
+
