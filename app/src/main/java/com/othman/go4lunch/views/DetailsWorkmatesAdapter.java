@@ -1,5 +1,7 @@
 package com.othman.go4lunch.views;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +25,13 @@ public class DetailsWorkmatesAdapter extends RecyclerView.Adapter<DetailsWorkmat
 
 
     private final List<User> workmatesList;
+    Context context;
 
 
-    public DetailsWorkmatesAdapter(List<User> workmatesList) {
+    public DetailsWorkmatesAdapter(List<User> workmatesList, Context context) {
 
         this.workmatesList = workmatesList;
+        this.context = context;
     }
 
 
@@ -64,6 +68,7 @@ public class DetailsWorkmatesAdapter extends RecyclerView.Adapter<DetailsWorkmat
         TextView workmateText;
 
 
+
         DetailsWorkmatesViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
@@ -74,8 +79,7 @@ public class DetailsWorkmatesAdapter extends RecyclerView.Adapter<DetailsWorkmat
         // Update UI with text and image
         void populateViewHolder(User workmate) {
 
-
-            workmateText.setText(workmate.getUsername() + " is joining !");
+            workmateText.setText(context.getResources().getString(R.string.someone_is_joining, workmate.getUsername()));
 
             if (workmate.getUrlPicture() != null) {
                 Picasso.get().load(workmate.getUrlPicture()).into(workmateImage);

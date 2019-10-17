@@ -6,8 +6,8 @@
     <string name="sign_in_with_facebook">SIGN IN WITH FACEBOOK</string>
     <string name="sign_in_with_google">SIGN IN WITH GOOGLE</string>
     <string name="sign_in_with_twitter">SIGN IN WITH TWITTER</string>
-    <string name="food_image">food_image</string>
-    <string name="go4lunch">Go4Lunch</string>
+    <string name="food_image" translatable="false">food_image</string>
+    <string name="go4lunch" translatable="false">Go4Lunch</string>
     <string name="error_not_connected">You must be connected</string>
     <string name="error_authentication_canceled">Authentication canceled</string>
     <string name="error_no_internet">No internet connection</string>
@@ -19,24 +19,18 @@
     <string name="facebook_application_id" translatable="false">390333651683057</string>
     <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">fb390333651683057</string>
 
-    <string name="google_maps_api_key">AIzaSyCL9H63r5Z9zX7QQ2UVPzJ5iTCFVrz3iTE</string>
+    <string name="google_maps_api_key" translatable="false">AIzaSyCL9H63r5Z9zX7QQ2UVPzJ5iTCFVrz3iTE</string>
 
     <string name="twitter_consumer_key" translatable="false">iq6nJsR2PQm9AeCTFhNi1sS1P</string>
     <string name="twitter_consumer_secret" translatable="false">nfnB01cMJy5LzGGSDtQ2LE4mdtlWP8I9stoW3rRTdpYw3h0Egw</string>
-    <string name="title_activity_main_page">MainPageActivity</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
+    <string name="title_activity_main_page" translatable="false">MainPageActivity</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+    <string name="nav_header_title" translatable="false">Android Studio</string>
+    <string name="nav_header_subtitle" translatable="false">android.studio@android.com</string>
+    <string name="nav_header_desc" translatable="false">Navigation header</string>
     <string name="action_settings">Settings</string>
 
-    <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
-    <string name="menu_tools">Tools</string>
-    <string name="menu_share">Share</string>
-    <string name="menu_send">Send</string>
     <string name="your_lunch">YOUR LUNCH</string>
     <string name="settings">SETTINGS</string>
     <string name="logout">LOGOUT</string>
@@ -44,15 +38,13 @@
     <string name="map_view">MAP VIEW</string>
     <string name="list_view">LIST VIEW</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="workmates">WORKMATES</string>
     <string name="background">background</string>
-    <string name="user_profile_picture">User profile picture</string>
+    <string name="user_profile_picture" translatable="false">User profile picture</string>
     <string name="no_username_found">No username found</string>
     <string name="no_email_found">No email found</string>
     <string name="no_hours">No hours</string>
-    <string name="workmate_picture">Workmate picture</string>
+    <string name="workmate_picture" translatable="false">Workmate picture</string>
     <string name="image_restaurant">Image restaurant</string>
     <string name="stars">Stars</string>
     <string name="call_button">Call button</string>
@@ -65,20 +57,6 @@
     <string name="closed">Closed</string>
     <string name="title_activity_settings">Settings</string>
 
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="notifications_on_off">Activate notifications</string>
     <string name="delete_confirmation">Do you really want to delete this account ?</string>
     <string name="yes">Yes</string>
@@ -86,7 +64,9 @@
     <string name="delete_account">DELETE ACCOUNT</string>
     <string name="no_restaurant_selected">There\'s no restaurant selected</string>
     <string name="unlike">UNLIKE</string>
-    <string name="is_joining">is joining !</string>
-    <string name="choice">has chosen</string>
-    <string name="no_choice">has not chosen any restaurant</string>
+    <string name="someone_is_joining">%1s is joining !</string>
+    <string name="choice">%s is going to %s today !</string>
+    <string name="no_choice">%s has not chosen any restaurant today.</string>
+    <string name="notification_alone">Today, you\'re going to %s, %s !</string>
+    <string name="notification_with_colleagues">Today, you\'re going to %s, %s with %s !</string>
 </resources>

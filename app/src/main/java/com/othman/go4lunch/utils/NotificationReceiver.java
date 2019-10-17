@@ -11,26 +11,36 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.controllers.activities.SettingsActivity;
+import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.models.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class NotificationReceiver extends BroadcastReceiver {
 
     private Context context;
-    private String restaurant;
+    private Restaurant restaurant;
+    private String name;
     private String address;
-    private List<User> workmatesList;
+    private ArrayList<String> workmateList;
+    private String workmates;
 
 
     @Override
@@ -47,6 +57,8 @@ public class NotificationReceiver extends BroadcastReceiver {
     // Get data from Firestore to display it in the notification
     private void getData() {
 
+        workmateList = new ArrayList<>();
+
         UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
@@ -55,15 +67,38 @@ public class NotificationReceiver extends BroadcastReceiver {
                         User currentUser = documentSnapshot.toObject(User.class);
 
                         if (currentUser.getChosenRestaurant() != null) {
-                            restaurant = currentUser.getChosenRestaurant().getName();
+                            restaurant = currentUser.getChosenRestaurant();
+                            name = currentUser.getChosenRestaurant().getName();
                             address = currentUser.getChosenRestaurant().getAddress();
                         }
                     }
                 });
+
+        UserHelper.getAllUsers().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        User createUser = document.toObject(User.class);
+
+                        if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) &&
+                                createUser.getChosenRestaurant() != null
+                                && createUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
+                            workmateList.add(createUser.getUsername());
+                        }
+                    }
+
+                    // Create String from list of workmates
+                    workmates = TextUtils.join(", ", workmateList);
+                }
+            }
+        });
     }
 
     // Create the notification to display the number of results from the API request
     private void createNotification(Context context) {
+
 
         // Verify if current user has chosen a restaurant
         UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -75,9 +110,16 @@ public class NotificationReceiver extends BroadcastReceiver {
                         if (currentUser.getChosenRestaurant() != null) {
 
 
+                            String notificationText = String.format(context.getResources().getString(R.string.notification_alone),
+                                    name, address);
+                            if (workmateList != null)
+                                notificationText = String.format(context.getResources().getString(R.string.notification_with_colleagues),
+                                        name, address, workmates);
+
                             Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                             Intent notificationIntent = new Intent(context, SettingsActivity.class);
-                            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1,
+                                    notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
                             // Configure Notification Channel if API 26+
@@ -96,10 +138,12 @@ public class NotificationReceiver extends BroadcastReceiver {
                                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, "Channel")
                                         .setSmallIcon(R.drawable.baseline_restaurant_24)
                                         .setContentTitle("Go4Lunch")
-                                        .setContentText("Chosen restaurant :" + restaurant + ", " + address)
+                                        .setContentText(notificationText)
+                                        .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationText))
                                         .setSound(alarmSound)
                                         .setContentIntent(pendingIntent)
                                         .setAutoCancel(true);
+
                                 if (notificationManager != null) {
                                     notificationManager.notify(1, notificationBuilder.build());
                                 }
@@ -109,7 +153,8 @@ public class NotificationReceiver extends BroadcastReceiver {
                                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, "NewsChannel")
                                         .setSmallIcon(R.drawable.baseline_restaurant_24)
                                         .setContentTitle("Go4Lunch")
-                                        .setContentText("Chosen restaurant :" + restaurant + ", " + address)
+                                        .setContentText(notificationText)
+                                        .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationText))
                                         .setSound(alarmSound)
                                         .setContentIntent(pendingIntent)
                                         .setAutoCancel(true);

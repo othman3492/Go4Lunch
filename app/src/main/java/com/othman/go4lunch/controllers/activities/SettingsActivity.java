@@ -97,8 +97,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         Intent intent = new Intent(SettingsActivity.this, NotificationReceiver.class);
 
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 1, intent,
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
@@ -110,9 +109,10 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void cancelAlarmManager() {
 
+        Intent intent = new Intent(SettingsActivity.this, NotificationReceiver.class);
 
-        Intent intent = new Intent();
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 1,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         if (alarmManager != null) {

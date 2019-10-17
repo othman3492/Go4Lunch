@@ -1,5 +1,6 @@
 package com.othman.go4lunch.views;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,19 +22,15 @@ import butterknife.ButterKnife;
 public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.WorkmatesViewHolder> {
 
 
-    // Interface to configure a listener on RecyclerView items
-    public interface RecyclerViewOnClickListener {
-
-        void recyclerViewOnClick(int position);
-    }
-
 
     private final List<User> workmatesList;
+    Context context;
 
 
-    public WorkmatesAdapter(List<User> workmatesList) {
+    public WorkmatesAdapter(List<User> workmatesList, Context context) {
 
         this.workmatesList = workmatesList;
+        this.context = context;
     }
 
 
@@ -82,9 +79,10 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.Work
 
 
             if (workmate.getChosenRestaurant() != null) {
-                workmateText.setText(workmate.getUsername() + " has chosen to go to " +  workmate.getChosenRestaurant().getName());
+                workmateText.setText(String.format(context.getResources().getString(R.string.choice), workmate.getUsername(),
+                        workmate.getChosenRestaurant().getName()));
             } else {
-                workmateText.setText(workmate.getUsername() + " has not chosen any restaurant today.");
+                workmateText.setText(String.format(context.getResources().getString(R.string.no_choice), workmate.getUsername()));
             }
 
             if (workmate.getUrlPicture() != null) {

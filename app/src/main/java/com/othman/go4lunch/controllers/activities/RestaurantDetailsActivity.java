@@ -271,7 +271,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     private void configureRecyclerView() {
 
         RecyclerView recyclerView = findViewById(R.id.restaurant_details_recycler_view);
-        this.adapter = new DetailsWorkmatesAdapter(this.workmateList);
+        this.adapter = new DetailsWorkmatesAdapter(this.workmateList, this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
