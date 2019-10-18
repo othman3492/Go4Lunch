@@ -3,24 +3,17 @@ package com.othman.go4lunch.controllers.activities;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.preference.PreferenceFragmentCompat;
 
-import com.facebook.login.Login;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.models.User;
 import com.othman.go4lunch.utils.NotificationReceiver;
@@ -56,31 +49,25 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Get switch state from Firestore
         UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                .addOnSuccessListener(documentSnapshot -> {
 
-                        User currentUser = documentSnapshot.toObject(User.class);
-                        if (currentUser.isNotificationsEnabled()) {
+                    User currentUser = documentSnapshot.toObject(User.class);
+                    if (currentUser.isNotificationsEnabled()) {
 
-                            notificationsSwitch.setChecked(true);
-                        }
+                        notificationsSwitch.setChecked(true);
                     }
                 });
 
-        notificationsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        notificationsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
 
-                if (isChecked) {
+            if (isChecked) {
 
-                    UserHelper.updateNotificationChoice(FirebaseAuth.getInstance().getCurrentUser().getUid(), true);
-                    configureAlarmManager();
-                } else {
+                UserHelper.updateNotificationChoice(FirebaseAuth.getInstance().getCurrentUser().getUid(), true);
+                configureAlarmManager();
+            } else {
 
-                    UserHelper.updateNotificationChoice(FirebaseAuth.getInstance().getCurrentUser().getUid(), false);
-                    cancelAlarmManager();
-                }
+                UserHelper.updateNotificationChoice(FirebaseAuth.getInstance().getCurrentUser().getUid(), false);
+                cancelAlarmManager();
             }
         });
     }
@@ -123,23 +110,11 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void setDeleteButton() {
 
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                new AlertDialog.Builder(v.getContext())
-                        .setMessage(R.string.delete_confirmation)
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                deleteUser();
-                            }
-                        })
-                        .setNegativeButton(R.string.no, null)
-                        .show();
-            }
-        });
+        deleteButton.setOnClickListener(v -> new AlertDialog.Builder(v.getContext())
+                .setMessage(R.string.delete_confirmation)
+                .setPositiveButton(R.string.yes, (dialog, which) -> deleteUser())
+                .setNegativeButton(R.string.no, null)
+                .show());
     }
 
 

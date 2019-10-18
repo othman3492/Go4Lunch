@@ -1,6 +1,5 @@
 package com.othman.go4lunch.controllers.activities;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,14 +12,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.models.User;
@@ -65,7 +59,6 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
 
 
     private List<User> workmateList;
-    private DetailsWorkmatesAdapter adapter;
     private Disposable disposable;
 
     @Override
@@ -125,46 +118,36 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
 
         // Verify if restaurant is currently chosen, then set buttons state accordingly
         UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                .addOnSuccessListener(documentSnapshot -> {
 
-                        User currentUser = documentSnapshot.toObject(User.class);
-                        if (currentUser.getChosenRestaurant() != null
-                                && currentUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
+                    User currentUser = documentSnapshot.toObject(User.class);
+                    if (currentUser.getChosenRestaurant() != null
+                            && currentUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
 
-                            checkFloatingActionButton.hide();
-                            uncheckFloatingActionButton.show();
-                        } else {
-                            uncheckFloatingActionButton.hide();
-                            checkFloatingActionButton.show();
-                        }
+                        checkFloatingActionButton.hide();
+                        uncheckFloatingActionButton.show();
+                    } else {
+                        uncheckFloatingActionButton.hide();
+                        checkFloatingActionButton.show();
                     }
                 });
 
 
         // Add chosen restaurant to database and switch buttons
-        checkFloatingActionButton.setOnClickListener(v -> {
+        checkFloatingActionButton.setOnClickListener(v -> UserHelper.updateChosenRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), restaurant)
+                .addOnSuccessListener(aVoid -> {
 
-            UserHelper.updateChosenRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), restaurant)
-                    .addOnSuccessListener(aVoid -> {
-
-                        checkFloatingActionButton.hide();
-                        uncheckFloatingActionButton.show();
-                    });
-        });
+                    checkFloatingActionButton.hide();
+                    uncheckFloatingActionButton.show();
+                }));
 
         // Remove restaurant from database and switch buttons
-        uncheckFloatingActionButton.setOnClickListener(v -> {
+        uncheckFloatingActionButton.setOnClickListener(v -> UserHelper.updateChosenRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), null)
+                .addOnSuccessListener(aVoid -> {
 
-
-            UserHelper.updateChosenRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), null)
-                    .addOnSuccessListener(aVoid -> {
-
-                        uncheckFloatingActionButton.hide();
-                        checkFloatingActionButton.show();
-                    });
-        });
+                    uncheckFloatingActionButton.hide();
+                    checkFloatingActionButton.show();
+                }));
 
     }
 
@@ -192,59 +175,41 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
 
         // Verify if restaurant is currently chosen, then set buttons state accordingly
         UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                .addOnSuccessListener(documentSnapshot -> {
 
-                        User currentUser = documentSnapshot.toObject(User.class);
-                        if (currentUser.getLikedRestaurants() != null) {
+                    User currentUser = documentSnapshot.toObject(User.class);
+                    if (currentUser.getLikedRestaurants() != null) {
 
-                            for (Restaurant likedRestaurant : currentUser.getLikedRestaurants()) {
-                                if (likedRestaurant.getPlaceId().equals(restaurant.getPlaceId())) {
-                                    likeButton.setVisibility(View.INVISIBLE);
-                                    unlikeButton.setVisibility(View.VISIBLE);
-                                }
+                        for (Restaurant likedRestaurant : currentUser.getLikedRestaurants()) {
+                            if (likedRestaurant.getPlaceId().equals(restaurant.getPlaceId())) {
+                                likeButton.setVisibility(View.INVISIBLE);
+                                unlikeButton.setVisibility(View.VISIBLE);
                             }
-                        } else {
-                            unlikeButton.setVisibility(View.INVISIBLE);
-                            likeButton.setVisibility(View.VISIBLE);
                         }
+                    } else {
+                        unlikeButton.setVisibility(View.INVISIBLE);
+                        likeButton.setVisibility(View.VISIBLE);
                     }
                 });
 
-        likeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        likeButton.setOnClickListener(v -> {
 
-                // Verify if restaurant isn't already liked, then like it
-                UserHelper.addLikedRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), restaurant)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
+            // Verify if restaurant isn't already liked, then like it
+            UserHelper.addLikedRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), restaurant)
+                    .addOnSuccessListener(aVoid -> {
 
-                                likeButton.setVisibility(View.INVISIBLE);
-                                unlikeButton.setVisibility(View.VISIBLE);
+                        likeButton.setVisibility(View.INVISIBLE);
+                        unlikeButton.setVisibility(View.VISIBLE);
 
-                            }
-                        });
-            }
+                    });
         });
 
-        unlikeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        unlikeButton.setOnClickListener(v -> UserHelper.removeLikedRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), restaurant)
+                .addOnSuccessListener(aVoid -> {
 
-                UserHelper.removeLikedRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), restaurant)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-
-                                unlikeButton.setVisibility(View.INVISIBLE);
-                                likeButton.setVisibility(View.VISIBLE);
-                            }
-                        });
-            }
-        });
+                    unlikeButton.setVisibility(View.INVISIBLE);
+                    likeButton.setVisibility(View.VISIBLE);
+                }));
     }
 
 
@@ -271,7 +236,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     private void configureRecyclerView() {
 
         RecyclerView recyclerView = findViewById(R.id.restaurant_details_recycler_view);
-        this.adapter = new DetailsWorkmatesAdapter(this.workmateList, this);
+        DetailsWorkmatesAdapter adapter = new DetailsWorkmatesAdapter(this.workmateList, this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
@@ -279,19 +244,16 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
 
     private void addWorkmates(Restaurant restaurant, List<User> workmateList) {
 
-        UserHelper.getAllUsers().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+        UserHelper.getAllUsers().addOnCompleteListener(task -> {
 
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        User createUser = document.toObject(User.class);
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    User createUser = document.toObject(User.class);
 
-                        if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) &&
-                                createUser.getChosenRestaurant() != null
-                                && createUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
-                            workmateList.add(createUser);
-                        }
+                    if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) &&
+                            createUser.getChosenRestaurant() != null
+                            && createUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
+                        workmateList.add(createUser);
                     }
                 }
             }

@@ -68,7 +68,6 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
     }
 
 
-
     class RestaurantsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
 
@@ -111,19 +110,19 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
 
             restaurantName.setText(restaurant.getName());
             restaurantAddress.setText(restaurant.getAddress());
-            restaurantWorkmatesNumber.setText("3");
             restaurantDistance.setText(restaurant.getDistance() + " m");
+            restaurantWorkmatesNumber.setText(String.valueOf(restaurant.getNbWorkmates()));
 
 
             // Set text depending on restaurant's opening hours
             if (restaurant.getOpenNow() == null) {
                 restaurantHours.setText(R.string.no_hours);
             } else if (restaurant.getOpenNow().equals("true")) {
-                    restaurantHours.setText(R.string.open);
-                    restaurantHours.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.Open));
-                } else {
-                    restaurantHours.setText(R.string.closed);
-                    restaurantHours.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.Closed));
+                restaurantHours.setText(R.string.open);
+                restaurantHours.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.Open));
+            } else {
+                restaurantHours.setText(R.string.closed);
+                restaurantHours.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.Closed));
             }
 
             // Set restaurant image
@@ -145,7 +144,5 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
             recyclerViewOnClickListener.recyclerViewOnClick(getAdapterPosition());
 
         }
-
     }
-
 }

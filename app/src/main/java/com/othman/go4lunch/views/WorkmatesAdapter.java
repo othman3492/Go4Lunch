@@ -24,7 +24,7 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.Work
 
 
     private final List<User> workmatesList;
-    Context context;
+    private final Context context;
 
 
     public WorkmatesAdapter(List<User> workmatesList, Context context) {

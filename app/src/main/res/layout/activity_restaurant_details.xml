@@ -130,7 +130,6 @@
             android:background="@drawable/baseline_phone_24"/>
 
         <TextView
-            android:id="@+id/restaurant_details_call_button_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/call"
@@ -167,7 +166,6 @@
             android:background="@drawable/baseline_star_color_24" />
 
         <TextView
-            android:id="@+id/restaurant_details_like_button_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/like"
@@ -205,7 +203,6 @@
             android:background="@drawable/baseline_star_white_24" />
 
         <TextView
-            android:id="@+id/restaurant_details_unlike_button_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/unlike"
@@ -241,7 +238,6 @@
             android:background="@drawable/baseline_public_24" />
 
         <TextView
-            android:id="@+id/restaurant_details_website_button_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/website"

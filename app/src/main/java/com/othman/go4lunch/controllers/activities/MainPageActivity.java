@@ -4,19 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,8 +22,6 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
@@ -37,15 +30,11 @@ import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.model.TypeFilter;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.controllers.fragments.ListFragment;
@@ -57,7 +46,6 @@ import com.othman.go4lunch.utils.UserHelper;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -77,8 +65,8 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
     private Disposable disposable;
     private final int AUTOCOMPLETE_REQUEST_CODE = 1;
-    static double currentLatitude;
-    static double currentLongitude;
+    private static double currentLatitude;
+    private static double currentLongitude;
 
 
     @Override
@@ -102,12 +90,8 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
     // Get data from current user
     @Nullable
-    public FirebaseUser getCurrentUser() {
+    private FirebaseUser getCurrentUser() {
         return FirebaseAuth.getInstance().getCurrentUser();
-    }
-
-    public boolean isUserLogged() {
-        return (this.getCurrentUser() != null);
     }
 
 
@@ -174,20 +158,17 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
         List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.TYPES, Place.Field.ADDRESS,
                 Place.Field.RATING, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI, Place.Field.PHOTO_METADATAS);
 
-        switch (item.getItemId()) {
-            case R.id.menu_activity_main_search:
-
-                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
-                        .setLocationBias(RectangularBounds.newInstance(
-                                new LatLng(currentLatitude - 0.1, currentLongitude - 0.1),
-                                new LatLng(currentLatitude + 0.1, currentLongitude + 0.1)))
-                        .setTypeFilter(TypeFilter.ESTABLISHMENT)
-                        .build(this);
-                startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.menu_activity_main_search) {
+            Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
+                    .setLocationBias(RectangularBounds.newInstance(
+                            new LatLng(currentLatitude - 0.1, currentLongitude - 0.1),
+                            new LatLng(currentLatitude + 0.1, currentLongitude + 0.1)))
+                    .setTypeFilter(TypeFilter.ESTABLISHMENT)
+                    .build(this);
+            startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -262,21 +243,18 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
         // Start selected RestaurantDetailsActivity
         private void startChosenRestaurantDetailsActivity () {
 
-            UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
+            UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid()).addOnSuccessListener(documentSnapshot -> {
 
-                    User currentUser = documentSnapshot.toObject(User.class);
+                User currentUser = documentSnapshot.toObject(User.class);
 
-                    Restaurant restaurant = currentUser.getChosenRestaurant();
+                Restaurant restaurant = currentUser.getChosenRestaurant();
 
-                    if (restaurant != null) {
-                        Intent intent = new Intent(MainPageActivity.this, RestaurantDetailsActivity.class);
-                        intent.putExtra("RESTAURANT", restaurant);
-                        startActivity(intent);
-                    } else {
-                        Toast.makeText(getApplicationContext(), getString(R.string.no_restaurant_selected), Toast.LENGTH_SHORT).show();
-                    }
+                if (restaurant != null) {
+                    Intent intent = new Intent(MainPageActivity.this, RestaurantDetailsActivity.class);
+                    intent.putExtra("RESTAURANT", restaurant);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getApplicationContext(), getString(R.string.no_restaurant_selected), Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -308,21 +286,16 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
                 // Get data from Firebase, and update views
                 UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        .addOnSuccessListener(documentSnapshot -> {
 
-                                User currentUser = documentSnapshot.toObject(User.class);
+                            String username = TextUtils.isEmpty(getCurrentUser().getDisplayName()) ?
+                                    getString(R.string.no_username_found) : FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+                            String email = TextUtils.isEmpty(getCurrentUser().getEmail()) ?
+                                    getString(R.string.no_email_found) : FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
-                                String username = TextUtils.isEmpty(getCurrentUser().getDisplayName()) ?
-                                        getString(R.string.no_username_found) : FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-                                String email = TextUtils.isEmpty(getCurrentUser().getEmail()) ?
-                                        getString(R.string.no_email_found) : FirebaseAuth.getInstance().getCurrentUser().getEmail();
+                            headerUserName.setText(username);
+                            headerUserEmail.setText(email);
 
-                                headerUserName.setText(username);
-                                headerUserEmail.setText(email);
-
-                            }
                         });
             }
 
@@ -337,12 +310,7 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
         private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted () {
 
-            return new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    MainPageActivity.this.finish();
-                }
-            };
+            return aVoid -> MainPageActivity.this.finish();
         }
 
 

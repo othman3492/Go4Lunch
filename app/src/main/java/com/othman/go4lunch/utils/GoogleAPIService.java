@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-public interface GoogleAPIService {
+interface GoogleAPIService {
 
 
     @GET("nearbysearch/json?")

@@ -16,15 +16,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.controllers.activities.RestaurantDetailsActivity;
 import com.othman.go4lunch.models.GooglePlaces;
 import com.othman.go4lunch.models.GooglePlacesDetails;
 import com.othman.go4lunch.models.Restaurant;
+import com.othman.go4lunch.models.User;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
+import com.othman.go4lunch.utils.UserHelper;
 import com.othman.go4lunch.views.RestaurantsAdapter;
-import com.othman.go4lunch.views.WorkmatesAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,10 +47,11 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
 
 
     private List<Restaurant> restaurantList;
+    private List<User> workmatesList;
     private RestaurantsAdapter adapter;
     private Disposable disposable;
-    static double currentLatitude;
-    static double currentLongitude;
+    private static double currentLatitude;
+    private static double currentLongitude;
 
 
     public ListFragment() {
@@ -62,11 +66,12 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
         View v =  inflater.inflate(R.layout.fragment_restaurants_list, container, false);
 
         restaurantList = new ArrayList<>();
+        workmatesList = new ArrayList<>();
         setParameters(currentLatitude, currentLongitude);
 
-        executeSearchNearbyPlacesRequest();
+        executeSearchNearbyPlacesRequest(v);
 
-        configureRecyclerView(v);
+        //configureRecyclerView(v);
 
         return v;
     }
@@ -84,7 +89,7 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
 
 
     // Create a list of Restaurant objects from the API request results
-    private List<Restaurant> createRestaurantList(List<GooglePlaces.Result> results) {
+    private void createRestaurantList(List<GooglePlaces.Result> results, View v) {
 
         List<Restaurant> restaurantList = new ArrayList<>();
 
@@ -95,10 +100,15 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
             executePlacesDetailsRequest(restaurant, restaurant.getPlaceId());
 
             restaurant.setDistance(configureDistance(restaurant));
+
+            configureWorkmatesNumber(restaurant);
+            restaurant.setNbWorkmates(workmatesList.size());
+
             restaurantList.add(restaurant);
         }
 
-        return restaurantList;
+        configureRecyclerView(v);
+        updateRestaurantList(restaurantList);
 
     }
 
@@ -134,9 +144,28 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
         return (int) currentLocation.distanceTo(restaurantLocation);
     }
 
+    // Get number of users who have chosen the restaurant
+    private void configureWorkmatesNumber(Restaurant restaurant) {
+
+        UserHelper.getAllUsers().addOnCompleteListener(task -> {
+
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    User createUser = document.toObject(User.class);
+
+                    if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) &&
+                            createUser.getChosenRestaurant() != null
+                            && createUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
+                        workmatesList.add(createUser);
+                    }
+                }
+            }
+        });
+    }
+
 
     // Execute HTTP request to retrieve nearby places
-    private void executeSearchNearbyPlacesRequest() {
+    private void executeSearchNearbyPlacesRequest(View v) {
 
         String type = "restaurant";
         String location = currentLatitude + "," + currentLongitude;
@@ -147,7 +176,7 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
                     @Override
                     public void onNext(GooglePlaces googlePlaces) {
 
-                        updateRestaurantList(createRestaurantList(googlePlaces.getResults()));
+                        createRestaurantList(googlePlaces.getResults(), v);
 
                         Log.e("TAG", "On Next");
                     }
@@ -156,7 +185,6 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
                     public void onError(Throwable e) {
 
                         Log.e("TAG", "On Error" + Log.getStackTraceString(e));
-
                     }
 
                     @Override

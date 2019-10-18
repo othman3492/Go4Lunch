@@ -1,7 +1,6 @@
 package com.othman.go4lunch.utils;
 
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -17,16 +16,16 @@ public class UserHelper {
 
 
     // COLLECTION REFERENCE
-    public static CollectionReference getUsersCollection() {
+    private static CollectionReference getUsersCollection() {
         return FirebaseFirestore.getInstance().collection("users");
     }
 
     // CREATE
-    public static Task<Void> createUser(String uid, String username, String urlPicture, Restaurant restaurant,
-                                        List<Restaurant> likedRestaurants, boolean isEnabled) {
+    public static void createUser(String uid, String username, String urlPicture, Restaurant restaurant,
+                                  List<Restaurant> likedRestaurants, boolean isEnabled) {
 
         User userToCreate = new User(uid, username, urlPicture, restaurant, likedRestaurants, isEnabled);
-        return UserHelper.getUsersCollection().document(uid).set(userToCreate);
+        UserHelper.getUsersCollection().document(uid).set(userToCreate);
     }
 
 
@@ -52,9 +51,9 @@ public class UserHelper {
         return UserHelper.getUsersCollection().document(uid).update("chosenRestaurant", restaurant);
     }
 
-    public static Task<Void> updateNotificationChoice(String uid, boolean isEnabled) {
+    public static void updateNotificationChoice(String uid, boolean isEnabled) {
 
-        return UserHelper.getUsersCollection().document(uid).update("notificationsEnabled", isEnabled);
+        UserHelper.getUsersCollection().document(uid).update("notificationsEnabled", isEnabled);
     }
 
 
@@ -64,9 +63,9 @@ public class UserHelper {
         return UserHelper.getUsersCollection().document(uid).update("likedRestaurants", FieldValue.arrayRemove(restaurant));
     }
 
-    public static Task<Void> deleteUser(String uid) {
+    public static void deleteUser(String uid) {
 
-        return UserHelper.getUsersCollection().document(uid).delete();
+        UserHelper.getUsersCollection().document(uid).delete();
     }
 
 

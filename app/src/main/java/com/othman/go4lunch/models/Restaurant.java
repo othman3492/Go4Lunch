@@ -1,8 +1,6 @@
 package com.othman.go4lunch.models;
 
 
-import android.location.Location;
-
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
 
@@ -20,23 +18,15 @@ public class Restaurant implements Serializable {
     private double latitude;
     private double longitude;
     private int distance;
+    private int nbWorkmates;
     private String phoneNumber;
     private String website;
     private String isOpenNow;
     private String imageUrl;
     private String placeId;
-    private List<User> usersList;
-
-    private Disposable disposable;
 
     public Restaurant() {
 
-    }
-
-
-    public Restaurant(String id) {
-
-        this.placeId = id;
     }
 
 
@@ -60,10 +50,6 @@ public class Restaurant implements Serializable {
         return rating;
     }
 
-    public void setRating(double rating) {
-        this.rating = rating;
-    }
-
     public String getPhoneNumber() { return phoneNumber; }
 
     public void setPhoneNumber(String phoneNumber) {
@@ -82,21 +68,17 @@ public class Restaurant implements Serializable {
         return isOpenNow;
     }
 
-    public void setOpenNow(String openNow) {
-        isOpenNow = openNow;
-    }
-
     public double getLatitude() { return latitude; }
 
-    public void setLatitude(double latitude) { this.latitude = latitude; }
-
     public double getLongitude() { return longitude; }
-
-    public void setLongitude(double longitude) { this.longitude = longitude; }
 
     public int getDistance() { return distance; }
 
     public void setDistance(int distance) { this.distance = distance; }
+
+    public int getNbWorkmates() { return nbWorkmates; }
+
+    public void setNbWorkmates(int nbWorkmates) { this.nbWorkmates = nbWorkmates; }
 
     public String getPlaceId() {
         return placeId;
@@ -112,22 +94,6 @@ public class Restaurant implements Serializable {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
-    }
-
-    public String getIsOpenNow() {
-        return isOpenNow;
-    }
-
-    public void setIsOpenNow(String isOpenNow) {
-        this.isOpenNow = isOpenNow;
-    }
-
-    public List<User> getUsersList() {
-        return usersList;
-    }
-
-    public void setUsersList(List<User> usersList) {
-        this.usersList = usersList;
     }
 
     // Create a Restaurant object and fill it with data from Search Results and Details Results
@@ -147,7 +113,6 @@ public class Restaurant implements Serializable {
             restaurant.isOpenNow = result.getOpeningHours().getOpenNow().toString();
         }
 
-
         if (result.getPhotos() != null)
             restaurant.imageUrl = imageBaseUrl + result.getPhotos().get(0).getPhotoReference()
                     + "&key=" + BuildConfig.google_apikey;
@@ -165,7 +130,7 @@ public class Restaurant implements Serializable {
 
         String key = BuildConfig.google_apikey;
 
-        this.disposable = GoogleAPIStreams.streamFetchPlacesDetails(key, placeId).subscribeWith(
+        Disposable disposable = GoogleAPIStreams.streamFetchPlacesDetails(key, placeId).subscribeWith(
                 new DisposableObserver<GooglePlacesDetails>() {
 
                     @Override

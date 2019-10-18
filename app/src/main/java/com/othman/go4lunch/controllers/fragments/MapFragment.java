@@ -2,7 +2,6 @@ package com.othman.go4lunch.controllers.fragments;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -24,7 +23,6 @@ import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -34,7 +32,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.othman.go4lunch.BuildConfig;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.controllers.activities.MainPageActivity;
@@ -44,7 +41,6 @@ import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.models.User;
 import com.othman.go4lunch.utils.GoogleAPIStreams;
 import com.othman.go4lunch.utils.UserHelper;
-import com.othman.go4lunch.views.RestaurantsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,13 +59,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @BindView(R.id.map_view)
     MapView mapView;
 
-    private ArrayList<Restaurant> restaurantList;
-
     private GoogleMap googleMap;
-    private CameraPosition cameraPosition;
 
-    private GeoDataClient geoDataClient;
-    private PlaceDetectionClient placeDetectionClient;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
     // Default location set to Paris if permission is not granted
@@ -80,14 +71,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     // Last known location retrieved by the Fused Location Provider
     private Location lastKnownLocation;
-    private LatLng currentLocation;
     private double currentLatitude;
     private double currentLongitude;
 
     // Keys for storing fragment state
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
-    private Disposable disposable;
 
 
     public MapFragment() {
@@ -102,15 +91,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // Retrieve location and camera position from saved instance state
         if (savedInstanceState != null) {
             lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-            cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
+            CameraPosition cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, view);
 
-        geoDataClient = getGeoDataClient(getContext());
-        placeDetectionClient = getPlaceDetectionClient(getContext());
+        GeoDataClient geoDataClient = getGeoDataClient(getContext());
+        PlaceDetectionClient placeDetectionClient = getPlaceDetectionClient(getContext());
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
 
@@ -238,7 +227,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         String location = currentLatitude + "," + currentLongitude;
         String key = BuildConfig.google_apikey;
 
-        this.disposable = GoogleAPIStreams.streamFetchPlaces(key, type, location, 5000).subscribeWith(
+        Disposable disposable = GoogleAPIStreams.streamFetchPlaces(key, type, location, 5000).subscribeWith(
                 new DisposableObserver<GooglePlaces>() {
                     @Override
                     public void onNext(GooglePlaces googlePlaces) {
@@ -285,8 +274,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     // Set markers on map for all restaurants and set info windows on click to open RestaurantDetailsActivity
     private void setMarkersOnMap(GoogleMap map, List<Restaurant> restaurantList) {
 
-        this.restaurantList = new ArrayList<>();
-        this.restaurantList.addAll(restaurantList);
+        ArrayList<Restaurant> restaurantList1 = new ArrayList<>();
+        restaurantList1.addAll(restaurantList);
 
         for (Restaurant restaurant : restaurantList) {
 
@@ -295,39 +284,33 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     .title(restaurant.getName()));
 
             // Change marker color if another user has chosen the restaurant
-            UserHelper.getAllUsers().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+            UserHelper.getAllUsers().addOnCompleteListener(task -> {
 
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            User createUser = document.toObject(User.class);
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        User createUser = document.toObject(User.class);
 
-                            if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) &&
-                                    createUser.getChosenRestaurant() != null &&
-                                    createUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
+                        if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) &&
+                                createUser.getChosenRestaurant() != null &&
+                                createUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
 
-                                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                            }
+                            marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                         }
                     }
                 }
             });
 
-            map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-                @Override
-                public void onInfoWindowClick(Marker marker) {
+            map.setOnInfoWindowClickListener(marker1 -> {
 
-                    LatLng latLng = marker.getPosition();
+                LatLng latLng = marker1.getPosition();
 
-                    for (Restaurant restaurant : restaurantList) {
+                for (Restaurant restaurant1 : restaurantList) {
 
-                        if (latLng.equals(new LatLng(restaurant.getLatitude(), restaurant.getLongitude()))) {
+                    if (latLng.equals(new LatLng(restaurant1.getLatitude(), restaurant1.getLongitude()))) {
 
-                            Intent intent = new Intent(getActivity(), RestaurantDetailsActivity.class);
-                            intent.putExtra("RESTAURANT", restaurant);
-                            startActivity(intent);
-                        }
+                        Intent intent = new Intent(getActivity(), RestaurantDetailsActivity.class);
+                        intent.putExtra("RESTAURANT", restaurant1);
+                        startActivity(intent);
                     }
                 }
             });

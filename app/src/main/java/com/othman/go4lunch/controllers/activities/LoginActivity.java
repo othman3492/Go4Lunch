@@ -1,28 +1,23 @@
 package com.othman.go4lunch.controllers.activities;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.othman.go4lunch.R;
 import com.othman.go4lunch.models.User;
 import com.othman.go4lunch.utils.UserHelper;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,7 +27,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     // Identifier for sign-in activity
-    public static final int RC_SIGN_IN = 100;
+    private static final int RC_SIGN_IN = 100;
 
     @BindView(R.id.main_constraint_layout)
     ConstraintLayout constraintLayout;
@@ -79,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
-                        .setAvailableProviders(Arrays.asList(
+                        .setAvailableProviders(Collections.singletonList(
                                 new AuthUI.IdpConfig.EmailBuilder().build()))
                         .setIsSmartLockEnabled(false, true)
                         .build(), RC_SIGN_IN);
@@ -92,7 +87,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
-                        .setAvailableProviders(Arrays.asList(
+                        .setAvailableProviders(Collections.singletonList(
                                 new AuthUI.IdpConfig.GoogleBuilder().build()))
                         .setIsSmartLockEnabled(false, true)
                         .build(), RC_SIGN_IN);
@@ -105,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
-                        .setAvailableProviders(Arrays.asList(
+                        .setAvailableProviders(Collections.singletonList(
                                 new AuthUI.IdpConfig.FacebookBuilder().build()))
                         .setIsSmartLockEnabled(false, true)
                         .build(), RC_SIGN_IN);
@@ -118,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
-                        .setAvailableProviders(Arrays.asList(
+                        .setAvailableProviders(Collections.singletonList(
                                 new AuthUI.IdpConfig.TwitterBuilder().build()))
                         .setIsSmartLockEnabled(false, true)
                         .build(), RC_SIGN_IN);
@@ -166,17 +161,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    // Get data from current user
-    @Nullable
-    public FirebaseUser getCurrentUser() {
-        return FirebaseAuth.getInstance().getCurrentUser();
-    }
-
-    public boolean isUserLogged() {
-        return (this.getCurrentUser() != null);
-    }
-
-
     // Create user in Firestore and store data
     private void createUserInFirestore() {
 
@@ -185,17 +169,14 @@ public class LoginActivity extends AppCompatActivity {
         String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
+        UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid()).addOnSuccessListener(documentSnapshot -> {
 
-                User currentUser = documentSnapshot.toObject(User.class);
-                if (currentUser != null)
-                    UserHelper.createUser(uid, username, urlPicture, currentUser.getChosenRestaurant(),
-                            currentUser.getLikedRestaurants(), currentUser.isNotificationsEnabled());
-                else
-                    UserHelper.createUser(uid, username, urlPicture, null, null, false);
-            }
+            User currentUser = documentSnapshot.toObject(User.class);
+            if (currentUser != null)
+                UserHelper.createUser(uid, username, urlPicture, currentUser.getChosenRestaurant(),
+                        currentUser.getLikedRestaurants(), currentUser.isNotificationsEnabled());
+            else
+                UserHelper.createUser(uid, username, urlPicture, null, null, false);
         });
 
 

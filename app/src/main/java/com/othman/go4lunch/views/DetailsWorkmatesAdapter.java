@@ -1,7 +1,6 @@
 package com.othman.go4lunch.views;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,7 @@ public class DetailsWorkmatesAdapter extends RecyclerView.Adapter<DetailsWorkmat
 
 
     private final List<User> workmatesList;
-    Context context;
+    private final Context context;
 
 
     public DetailsWorkmatesAdapter(List<User> workmatesList, Context context) {

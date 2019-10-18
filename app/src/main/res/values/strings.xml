@@ -8,13 +8,10 @@
     <string name="sign_in_with_twitter">SIGN IN WITH TWITTER</string>
     <string name="food_image" translatable="false">food_image</string>
     <string name="go4lunch" translatable="false">Go4Lunch</string>
-    <string name="error_not_connected">You must be connected</string>
     <string name="error_authentication_canceled">Authentication canceled</string>
     <string name="error_no_internet">No internet connection</string>
     <string name="error_unknown_error">Unknown error</string>
     <string name="connection_succeed">Authentication successful</string>
-    <string name="button_login_text_logged">Show profile</string>
-    <string name="button_login_text_not_logged">Connection</string>
 
     <string name="facebook_application_id" translatable="false">390333651683057</string>
     <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">fb390333651683057</string>
@@ -23,13 +20,8 @@
 
     <string name="twitter_consumer_key" translatable="false">iq6nJsR2PQm9AeCTFhNi1sS1P</string>
     <string name="twitter_consumer_secret" translatable="false">nfnB01cMJy5LzGGSDtQ2LE4mdtlWP8I9stoW3rRTdpYw3h0Egw</string>
-    <string name="title_activity_main_page" translatable="false">MainPageActivity</string>
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
-    <string name="nav_header_title" translatable="false">Android Studio</string>
-    <string name="nav_header_subtitle" translatable="false">android.studio@android.com</string>
-    <string name="nav_header_desc" translatable="false">Navigation header</string>
-    <string name="action_settings">Settings</string>
 
     <string name="your_lunch">YOUR LUNCH</string>
     <string name="settings">SETTINGS</string>
