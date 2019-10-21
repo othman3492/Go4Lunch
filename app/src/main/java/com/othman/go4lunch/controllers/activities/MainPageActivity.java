@@ -9,6 +9,9 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -42,9 +45,12 @@ import com.othman.go4lunch.controllers.fragments.MapFragment;
 import com.othman.go4lunch.controllers.fragments.WorkmatesFragment;
 import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.models.User;
+import com.othman.go4lunch.utils.DeleteReceiver;
+import com.othman.go4lunch.utils.NotificationReceiver;
 import com.othman.go4lunch.utils.UserHelper;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -86,6 +92,9 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
         navigationView.setNavigationItemSelectedListener(this);
         configureDrawerLayout();
         configureBottomNavigationView();
+
+        // Delete all restaurants everyday
+        configureDeleteAlarmManager();
     }
 
     // Get data from current user
@@ -215,103 +224,103 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
     }
 
 
-        @Override
-        public boolean onNavigationItemSelected (@NonNull MenuItem menuItem){
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
-            switch (menuItem.getItemId()) {
+        switch (menuItem.getItemId()) {
 
-                // Open restaurant details
-                case R.id.main_page_drawer_lunch:
-                    startChosenRestaurantDetailsActivity();
-                    break;
-                // Open SettingsActivity
-                case R.id.main_page_drawer_settings:
-                    Intent settingsIntent = new Intent(MainPageActivity.this, SettingsActivity.class);
-                    startActivity(settingsIntent);
-                    break;
-                // Sign out from app
-                case R.id.main_page_drawer_logout:
-                    signOutFromFirebase();
-                    break;
+            // Open restaurant details
+            case R.id.main_page_drawer_lunch:
+                startChosenRestaurantDetailsActivity();
+                break;
+            // Open SettingsActivity
+            case R.id.main_page_drawer_settings:
+                Intent settingsIntent = new Intent(MainPageActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                break;
+            // Sign out from app
+            case R.id.main_page_drawer_logout:
+                signOutFromFirebase();
+                break;
+        }
+
+
+        return false;
+    }
+
+
+    // Start selected RestaurantDetailsActivity
+    private void startChosenRestaurantDetailsActivity() {
+
+        UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid()).addOnSuccessListener(documentSnapshot -> {
+
+            User currentUser = documentSnapshot.toObject(User.class);
+
+            Restaurant restaurant = currentUser.getChosenRestaurant();
+
+            if (restaurant != null) {
+                Intent intent = new Intent(MainPageActivity.this, RestaurantDetailsActivity.class);
+                intent.putExtra("RESTAURANT", restaurant);
+                startActivity(intent);
+            } else {
+                Toast.makeText(getApplicationContext(), getString(R.string.no_restaurant_selected), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    // Update UI when activity is creating
+    private void updateUIWhenCreating() {
+
+        // Display map fragment by default
+        Fragment fragment = new MapFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
+
+        // Configure views if current user is not null
+        if (getCurrentUser() != null) {
+
+            View header = navigationView.getHeaderView(0);
+            ImageView headerUserImage = header.findViewById(R.id.header_user_image);
+            TextView headerUserName = header.findViewById(R.id.header_user_name);
+            TextView headerUserEmail = header.findViewById(R.id.header_user_email);
+
+            // Get user profile picture from Firebase
+            if (getCurrentUser().getPhotoUrl() != null) {
+
+                Glide.with(this)
+                        .load(getCurrentUser().getPhotoUrl())
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(headerUserImage);
             }
 
+            // Get data from Firebase, and update views
+            UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .addOnSuccessListener(documentSnapshot -> {
 
-            return false;
+                        String username = TextUtils.isEmpty(getCurrentUser().getDisplayName()) ?
+                                getString(R.string.no_username_found) : FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+                        String email = TextUtils.isEmpty(getCurrentUser().getEmail()) ?
+                                getString(R.string.no_email_found) : FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+                        headerUserName.setText(username);
+                        headerUserEmail.setText(email);
+
+                    });
         }
 
-
-        // Start selected RestaurantDetailsActivity
-        private void startChosenRestaurantDetailsActivity () {
-
-            UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid()).addOnSuccessListener(documentSnapshot -> {
-
-                User currentUser = documentSnapshot.toObject(User.class);
-
-                Restaurant restaurant = currentUser.getChosenRestaurant();
-
-                if (restaurant != null) {
-                    Intent intent = new Intent(MainPageActivity.this, RestaurantDetailsActivity.class);
-                    intent.putExtra("RESTAURANT", restaurant);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(getApplicationContext(), getString(R.string.no_restaurant_selected), Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+    }
 
 
-        // Update UI when activity is creating
-        private void updateUIWhenCreating () {
+    // Log out user and update UI
+    private void signOutFromFirebase() {
 
-            // Display map fragment by default
-            Fragment fragment = new MapFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
+        AuthUI.getInstance().signOut(this).addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted());
+    }
 
-            // Configure views if current user is not null
-            if (getCurrentUser() != null) {
+    private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted() {
 
-                View header = navigationView.getHeaderView(0);
-                ImageView headerUserImage = header.findViewById(R.id.header_user_image);
-                TextView headerUserName = header.findViewById(R.id.header_user_name);
-                TextView headerUserEmail = header.findViewById(R.id.header_user_email);
-
-                // Get user profile picture from Firebase
-                if (getCurrentUser().getPhotoUrl() != null) {
-
-                    Glide.with(this)
-                            .load(getCurrentUser().getPhotoUrl())
-                            .apply(RequestOptions.circleCropTransform())
-                            .into(headerUserImage);
-                }
-
-                // Get data from Firebase, and update views
-                UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                        .addOnSuccessListener(documentSnapshot -> {
-
-                            String username = TextUtils.isEmpty(getCurrentUser().getDisplayName()) ?
-                                    getString(R.string.no_username_found) : FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-                            String email = TextUtils.isEmpty(getCurrentUser().getEmail()) ?
-                                    getString(R.string.no_email_found) : FirebaseAuth.getInstance().getCurrentUser().getEmail();
-
-                            headerUserName.setText(username);
-                            headerUserEmail.setText(email);
-
-                        });
-            }
-
-        }
-
-
-        // Log out user and update UI
-        private void signOutFromFirebase () {
-
-            AuthUI.getInstance().signOut(this).addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted());
-        }
-
-        private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted () {
-
-            return aVoid -> MainPageActivity.this.finish();
-        }
+        return aVoid -> MainPageActivity.this.finish();
+    }
 
 
     // Get location parameters from MapFragment to use them in the request
@@ -320,7 +329,26 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
         currentLatitude = latitude;
         currentLongitude = longitude;
     }
+
+
+    // Create AlarmManager to plan the deleting of all chosen restaurants everyday at 4:00 PM
+    private void configureDeleteAlarmManager() {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 16);
+
+        Intent intent = new Intent(MainPageActivity.this, DeleteReceiver.class);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        }
     }
+}
 
 
 

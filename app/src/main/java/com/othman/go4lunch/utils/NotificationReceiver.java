@@ -36,14 +36,12 @@ public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        getData();
-        createNotification(context);
-
+        getData(context);
     }
 
 
     // Get data from Firestore to display it in the notification
-    private void getData() {
+    private void getData(Context context) {
 
         workmateList = new ArrayList<>();
 
@@ -56,27 +54,30 @@ public class NotificationReceiver extends BroadcastReceiver {
                         restaurant = currentUser.getChosenRestaurant();
                         name = currentUser.getChosenRestaurant().getName();
                         address = currentUser.getChosenRestaurant().getAddress();
+
+                        UserHelper.getAllUsers().addOnCompleteListener(task -> {
+
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    User createUser = document.toObject(User.class);
+
+                                    if (createUser.getChosenRestaurant() != null) {
+                                        if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                && createUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
+                                            workmateList.add(createUser.getUsername());
+                                        }
+                                    }
+                                }
+
+                                // Create String from list of workmates
+                                workmates = TextUtils.join(", ", workmateList);
+
+                                createNotification(context);
+                            }
+                        });
                     }
                 });
 
-        UserHelper.getAllUsers().addOnCompleteListener(task -> {
-
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    User createUser = document.toObject(User.class);
-
-                    if (createUser.getChosenRestaurant() != null) {
-                        if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                && createUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
-                            workmateList.add(createUser.getUsername());
-                        }
-                    }
-                }
-
-                // Create String from list of workmates
-                workmates = TextUtils.join(", ", workmateList);
-            }
-        });
     }
 
     // Create the notification to display the number of results from the API request

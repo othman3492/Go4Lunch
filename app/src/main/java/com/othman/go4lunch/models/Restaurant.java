@@ -64,10 +64,6 @@ public class Restaurant implements Serializable {
         this.website = website;
     }
 
-    public String getOpenNow() {
-        return isOpenNow;
-    }
-
     public double getLatitude() { return latitude; }
 
     public double getLongitude() { return longitude; }
@@ -96,6 +92,26 @@ public class Restaurant implements Serializable {
         this.imageUrl = imageUrl;
     }
 
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getIsOpenNow() {
+        return isOpenNow;
+    }
+
+    public void setIsOpenNow(String isOpenNow) {
+        this.isOpenNow = isOpenNow;
+    }
+
     // Create a Restaurant object and fill it with data from Search Results and Details Results
     public Restaurant createRestaurantfromAPIResults(GooglePlaces.Result result) {
 
@@ -118,42 +134,12 @@ public class Restaurant implements Serializable {
                     + "&key=" + BuildConfig.google_apikey;
 
 
-        executePlacesDetailsRequest(restaurant, restaurant.placeId);
-
-
         return restaurant;
     }
 
 
-    // Execute HTTP request to retrieve more information from the place
-    private void executePlacesDetailsRequest(Restaurant restaurant, String placeId) {
-
-        String key = BuildConfig.google_apikey;
-
-        Disposable disposable = GoogleAPIStreams.streamFetchPlacesDetails(key, placeId).subscribeWith(
-                new DisposableObserver<GooglePlacesDetails>() {
-
-                    @Override
-                    public void onNext(GooglePlacesDetails googlePlacesDetails) {
-
-                        addDataFromDetailsRequest(restaurant, googlePlacesDetails.getResult());
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }
-
-
-    // Complete restaurant object with data from Details Request
-    private void addDataFromDetailsRequest(Restaurant restaurant, GooglePlacesDetails.Result result) {
+    // Add data from Details Request to Restaurant object
+    public void addDataFromDetailsRequest(Restaurant restaurant, GooglePlacesDetails.Result result) {
 
         restaurant.rating = result.getRating();
         restaurant.phoneNumber = result.getFormattedPhoneNumber();

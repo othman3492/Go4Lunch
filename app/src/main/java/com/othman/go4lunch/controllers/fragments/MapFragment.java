@@ -283,7 +283,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     .position(new LatLng(restaurant.getLatitude(), restaurant.getLongitude()))
                     .title(restaurant.getName()));
 
-            // Change marker color if another user has chosen the restaurant
+            // Change marker color to blue if restaurant is liked
+            UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .addOnSuccessListener(documentSnapshot -> {
+
+                        User currentUser = documentSnapshot.toObject(User.class);
+                        if (currentUser.getLikedRestaurants() != null) {
+
+                            for (Restaurant likedRestaurant : currentUser.getLikedRestaurants()) {
+                                if (likedRestaurant.getPlaceId().equals(restaurant.getPlaceId())) {
+                                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                                }
+                            }
+                        }
+                    });
+
+            // Change marker color to green if another user has chosen the restaurant
             UserHelper.getAllUsers().addOnCompleteListener(task -> {
 
                 if (task.isSuccessful()) {

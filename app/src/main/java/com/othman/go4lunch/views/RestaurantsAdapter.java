@@ -115,9 +115,9 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
 
 
             // Set text depending on restaurant's opening hours
-            if (restaurant.getOpenNow() == null) {
+            if (restaurant.getIsOpenNow() == null) {
                 restaurantHours.setText(R.string.no_hours);
-            } else if (restaurant.getOpenNow().equals("true")) {
+            } else if (restaurant.getIsOpenNow().equals("true")) {
                 restaurantHours.setText(R.string.open);
                 restaurantHours.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.Open));
             } else {
@@ -129,6 +129,9 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
             Picasso.get().load(restaurant.getImageUrl()).into(restaurantImage);
 
             // Display stars depending on restaurant's rating
+            restaurantStar1.setVisibility(View.VISIBLE);
+            restaurantStar2.setVisibility(View.VISIBLE);
+            restaurantStar3.setVisibility(View.VISIBLE);
             if (restaurant.getRating() < 4.0)
                 restaurantStar3.setVisibility(View.GONE);
             else if (restaurant.getRating() < 3.0)

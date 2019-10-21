@@ -142,12 +142,17 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
                 }));
 
         // Remove restaurant from database and switch buttons
-        uncheckFloatingActionButton.setOnClickListener(v -> UserHelper.updateChosenRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), null)
-                .addOnSuccessListener(aVoid -> {
+        uncheckFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UserHelper.updateChosenRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), null)
+                        .addOnSuccessListener(aVoid -> {
 
-                    uncheckFloatingActionButton.hide();
-                    checkFloatingActionButton.show();
-                }));
+                            uncheckFloatingActionButton.hide();
+                            checkFloatingActionButton.show();
+                        });
+            }
+        });
 
     }
 

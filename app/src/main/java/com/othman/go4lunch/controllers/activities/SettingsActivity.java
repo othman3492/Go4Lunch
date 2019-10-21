@@ -63,18 +63,18 @@ public class SettingsActivity extends AppCompatActivity {
             if (isChecked) {
 
                 UserHelper.updateNotificationChoice(FirebaseAuth.getInstance().getCurrentUser().getUid(), true);
-                configureAlarmManager();
+                configureNotificationAlarmManager();
             } else {
 
                 UserHelper.updateNotificationChoice(FirebaseAuth.getInstance().getCurrentUser().getUid(), false);
-                cancelAlarmManager();
+                cancelNotificationAlarmManager();
             }
         });
     }
 
 
     // Create the AlarmManager to plan the notification to be called every day
-    private void configureAlarmManager() {
+    private void configureNotificationAlarmManager() {
 
 
         // Set the alarm to start at noon
@@ -94,7 +94,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
-    private void cancelAlarmManager() {
+    private void cancelNotificationAlarmManager() {
 
         Intent intent = new Intent(SettingsActivity.this, NotificationReceiver.class);
 

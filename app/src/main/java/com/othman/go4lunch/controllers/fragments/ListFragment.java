@@ -144,6 +144,7 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
         return (int) currentLocation.distanceTo(restaurantLocation);
     }
 
+
     // Get number of users who have chosen the restaurant
     private void configureWorkmatesNumber(Restaurant restaurant) {
 
@@ -157,8 +158,11 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
                             createUser.getChosenRestaurant() != null
                             && createUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
                         workmatesList.add(createUser);
+                        restaurant.setNbWorkmates(workmatesList.size());
                     }
                 }
+
+                this.adapter.notifyDataSetChanged();
             }
         });
     }
@@ -207,7 +211,8 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
                     @Override
                     public void onNext(GooglePlacesDetails googlePlacesDetails) {
 
-
+                        restaurant.addDataFromDetailsRequest(restaurant, googlePlacesDetails.getResult());
+                        updateRestaurantList(restaurantList);
 
                     }
 
