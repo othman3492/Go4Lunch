@@ -46,12 +46,12 @@ import com.othman.go4lunch.controllers.fragments.WorkmatesFragment;
 import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.models.User;
 import com.othman.go4lunch.utils.DeleteReceiver;
-import com.othman.go4lunch.utils.NotificationReceiver;
 import com.othman.go4lunch.utils.UserHelper;
 
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -154,7 +154,7 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
             }
 
             // Display fragment depending on item selected
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, Objects.requireNonNull(selectedFragment)).commit();
 
             return true;
         });
@@ -189,7 +189,7 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
 
-                Place place = Autocomplete.getPlaceFromIntent(data);
+                Place place = Autocomplete.getPlaceFromIntent(Objects.requireNonNull(data));
 
                 Intent intent = new Intent(this, RestaurantDetailsActivity.class);
                 intent.putExtra("RESTAURANT", createRestaurantFromPlaceAutocomplete(place));
@@ -252,11 +252,11 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
     // Start selected RestaurantDetailsActivity
     private void startChosenRestaurantDetailsActivity() {
 
-        UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid()).addOnSuccessListener(documentSnapshot -> {
+        UserHelper.getUser(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).addOnSuccessListener(documentSnapshot -> {
 
             User currentUser = documentSnapshot.toObject(User.class);
 
-            Restaurant restaurant = currentUser.getChosenRestaurant();
+            Restaurant restaurant = Objects.requireNonNull(currentUser).getChosenRestaurant();
 
             if (restaurant != null) {
                 Intent intent = new Intent(MainPageActivity.this, RestaurantDetailsActivity.class);
@@ -284,17 +284,23 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
             TextView headerUserName = header.findViewById(R.id.header_user_name);
             TextView headerUserEmail = header.findViewById(R.id.header_user_email);
 
-            // Get user profile picture from Firebase
+            // Get user profile picture from Firebase, or set blank profile picture
             if (getCurrentUser().getPhotoUrl() != null) {
 
                 Glide.with(this)
                         .load(getCurrentUser().getPhotoUrl())
                         .apply(RequestOptions.circleCropTransform())
                         .into(headerUserImage);
+            } else {
+
+                Glide.with(this)
+                        .load(R.drawable.blank_profile)
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(headerUserImage);
             }
 
             // Get data from Firebase, and update views
-            UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
+            UserHelper.getUser(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                     .addOnSuccessListener(documentSnapshot -> {
 
                         String username = TextUtils.isEmpty(getCurrentUser().getDisplayName()) ?
@@ -340,7 +346,7 @@ public class MainPageActivity extends AppCompatActivity implements NavigationVie
 
         Intent intent = new Intent(MainPageActivity.this, DeleteReceiver.class);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent,
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 2, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);

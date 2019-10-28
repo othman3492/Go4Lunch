@@ -22,6 +22,7 @@ import com.othman.go4lunch.models.Restaurant;
 import com.othman.go4lunch.models.User;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class NotificationReceiver extends BroadcastReceiver {
@@ -45,12 +46,12 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         workmateList = new ArrayList<>();
 
-        UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
+        UserHelper.getUser(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                 .addOnSuccessListener(documentSnapshot -> {
 
                     User currentUser = documentSnapshot.toObject(User.class);
 
-                    if (currentUser.getChosenRestaurant() != null) {
+                    if (Objects.requireNonNull(currentUser).getChosenRestaurant() != null) {
                         restaurant = currentUser.getChosenRestaurant();
                         name = currentUser.getChosenRestaurant().getName();
                         address = currentUser.getChosenRestaurant().getAddress();
@@ -58,7 +59,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                         UserHelper.getAllUsers().addOnCompleteListener(task -> {
 
                             if (task.isSuccessful()) {
-                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                                     User createUser = document.toObject(User.class);
 
                                     if (createUser.getChosenRestaurant() != null) {
@@ -84,11 +85,11 @@ public class NotificationReceiver extends BroadcastReceiver {
     private void createNotification(Context context) {
 
         // Verify if current user has chosen a restaurant
-        UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
+        UserHelper.getUser(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                 .addOnSuccessListener(documentSnapshot -> {
 
                     User currentUser = documentSnapshot.toObject(User.class);
-                    if (currentUser.getChosenRestaurant() != null) {
+                    if (Objects.requireNonNull(currentUser).getChosenRestaurant() != null) {
 
 
                         String notificationText = String.format(context.getResources().getString(R.string.notification_alone),

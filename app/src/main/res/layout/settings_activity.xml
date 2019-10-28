@@ -11,13 +11,13 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/go4LunchThemeColor"
-        app:title="Settings"
+        app:title="@string/title_activity_settings"
         app:layout_constraintTop_toTopOf="parent"
         app:titleTextColor="@color/white" />
 
 
-    <EditText
-        android:id="@+id/notification_edit_text"
+    <TextView
+        android:id="@+id/notification_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
@@ -30,10 +30,10 @@
         android:id="@+id/notifications_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/notification_edit_text"
+        app:layout_constraintStart_toEndOf="@id/notification_text_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/notification_edit_text"
-        app:layout_constraintBottom_toBottomOf="@id/notification_edit_text"/>
+        app:layout_constraintTop_toTopOf="@id/notification_text_view"
+        app:layout_constraintBottom_toBottomOf="@id/notification_text_view"/>
 
     <Button
         android:id="@+id/delete_button"
@@ -43,7 +43,7 @@
         android:layout_marginTop="50dp"
         android:paddingStart="60dp"
         android:paddingEnd="60dp"
-        app:layout_constraintTop_toBottomOf="@id/notification_edit_text"
+        app:layout_constraintTop_toBottomOf="@id/notification_text_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 

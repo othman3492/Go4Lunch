@@ -44,6 +44,7 @@ import com.othman.go4lunch.utils.UserHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -85,7 +86,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         // Retrieve location and camera position from saved instance state
@@ -98,7 +99,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, view);
 
-        GeoDataClient geoDataClient = getGeoDataClient(getContext());
+        GeoDataClient geoDataClient = getGeoDataClient(Objects.requireNonNull(getContext()));
         PlaceDetectionClient placeDetectionClient = getPlaceDetectionClient(getContext());
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
@@ -150,13 +151,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (locationPermissionGranted) {
 
             Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-            locationResult.addOnCompleteListener(getActivity(), task -> {
+            locationResult.addOnCompleteListener(Objects.requireNonNull(getActivity()), task -> {
 
                 if (task.isSuccessful()) {
 
                     // Set the map's camera
                     lastKnownLocation = task.getResult();
-                    currentLatitude = lastKnownLocation.getLatitude();
+                    currentLatitude = Objects.requireNonNull(lastKnownLocation).getLatitude();
                     currentLongitude = lastKnownLocation.getLongitude();
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                             new LatLng(currentLatitude, currentLongitude), DEFAULT_ZOOM));
@@ -175,7 +176,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     // Ask user for permission to use the device location
     private void getLocationPermission() {
 
-        if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()), android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             locationPermissionGranted = true;
         } else {
@@ -274,8 +275,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     // Set markers on map for all restaurants and set info windows on click to open RestaurantDetailsActivity
     private void setMarkersOnMap(GoogleMap map, List<Restaurant> restaurantList) {
 
-        ArrayList<Restaurant> restaurantList1 = new ArrayList<>();
-        restaurantList1.addAll(restaurantList);
+        ArrayList<Restaurant> restaurantList1 = new ArrayList<>(restaurantList);
 
         for (Restaurant restaurant : restaurantList) {
 
@@ -284,11 +284,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     .title(restaurant.getName()));
 
             // Change marker color to blue if restaurant is liked
-            UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
+            UserHelper.getUser(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                     .addOnSuccessListener(documentSnapshot -> {
 
                         User currentUser = documentSnapshot.toObject(User.class);
-                        if (currentUser.getLikedRestaurants() != null) {
+                        if (Objects.requireNonNull(currentUser).getLikedRestaurants() != null) {
 
                             for (Restaurant likedRestaurant : currentUser.getLikedRestaurants()) {
                                 if (likedRestaurant.getPlaceId().equals(restaurant.getPlaceId())) {
@@ -302,7 +302,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             UserHelper.getAllUsers().addOnCompleteListener(task -> {
 
                 if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
+                    for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                         User createUser = document.toObject(User.class);
 
                         if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) &&

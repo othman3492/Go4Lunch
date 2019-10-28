@@ -1,5 +1,6 @@
 package com.othman.go4lunch.views;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,12 +34,14 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
 
     private final List<Restaurant> restaurantsList;
     private final RecyclerViewOnClickListener listener;
+    private final Context context;
 
 
-    public RestaurantsAdapter(List<Restaurant> restaurantsList, RecyclerViewOnClickListener listener) {
+    public RestaurantsAdapter(List<Restaurant> restaurantsList, RecyclerViewOnClickListener listener, Context context) {
 
         this.restaurantsList = restaurantsList;
         this.listener = listener;
+        this.context = context;
     }
 
 
@@ -110,7 +113,8 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
 
             restaurantName.setText(restaurant.getName());
             restaurantAddress.setText(restaurant.getAddress());
-            restaurantDistance.setText(restaurant.getDistance() + " m");
+            restaurantDistance.setText(String.format(context.getResources().getString(R.string.distance),
+                    String.valueOf(restaurant.getDistance())));
             restaurantWorkmatesNumber.setText(String.valueOf(restaurant.getNbWorkmates()));
 
 

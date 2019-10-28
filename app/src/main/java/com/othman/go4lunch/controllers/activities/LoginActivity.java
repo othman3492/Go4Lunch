@@ -16,8 +16,8 @@ import com.othman.go4lunch.R;
 import com.othman.go4lunch.models.User;
 import com.othman.go4lunch.utils.UserHelper;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -151,7 +151,7 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 if (response == null) {
                     showSnackbar(constraintLayout, getString(R.string.error_authentication_canceled));
-                } else if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
+                } else if (Objects.requireNonNull(response.getError()).getErrorCode() == ErrorCodes.NO_NETWORK) {
                     showSnackbar(constraintLayout, getString(R.string.error_no_internet));
                 } else if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
                     showSnackbar(constraintLayout, getString(R.string.error_unknown_error));
@@ -164,7 +164,7 @@ public class LoginActivity extends AppCompatActivity {
     // Create user in Firestore and store data
     private void createUserInFirestore() {
 
-        String urlPicture = (FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl() != null) ?
+        String urlPicture = (Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhotoUrl() != null) ?
                 FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString() : null;
         String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();

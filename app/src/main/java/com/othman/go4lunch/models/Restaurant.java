@@ -2,13 +2,8 @@ package com.othman.go4lunch.models;
 
 
 import com.othman.go4lunch.BuildConfig;
-import com.othman.go4lunch.utils.GoogleAPIStreams;
 
 import java.io.Serializable;
-import java.util.List;
-
-import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DisposableObserver;
 
 public class Restaurant implements Serializable {
 

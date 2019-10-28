@@ -31,6 +31,7 @@ import com.othman.go4lunch.views.RestaurantsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import io.reactivex.disposables.Disposable;
@@ -81,7 +82,7 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
     private void configureRecyclerView(View v) {
 
         RecyclerView recyclerView = v.findViewById(R.id.restaurants_recycler_view);
-        this.adapter = new RestaurantsAdapter(this.restaurantList, this);
+        this.adapter = new RestaurantsAdapter(this.restaurantList, this, getActivity());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
@@ -102,7 +103,6 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
             restaurant.setDistance(configureDistance(restaurant));
 
             configureWorkmatesNumber(restaurant);
-            restaurant.setNbWorkmates(workmatesList.size());
 
             restaurantList.add(restaurant);
         }
@@ -151,17 +151,21 @@ public class ListFragment extends Fragment implements RestaurantsAdapter.Recycle
         UserHelper.getAllUsers().addOnCompleteListener(task -> {
 
             if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
+                for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+
                     User createUser = document.toObject(User.class);
 
-                    if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) &&
+                    if (!createUser.getUserId().equals(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()) &&
                             createUser.getChosenRestaurant() != null
                             && createUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
                         workmatesList.add(createUser);
                         restaurant.setNbWorkmates(workmatesList.size());
                     }
+
+
                 }
 
+                workmatesList.clear();
                 this.adapter.notifyDataSetChanged();
             }
         });

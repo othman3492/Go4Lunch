@@ -24,6 +24,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -87,7 +88,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Restaurant restaurant = (Restaurant) intent.getSerializableExtra("RESTAURANT");
 
-        restaurantName.setText(restaurant.getName());
+        restaurantName.setText(Objects.requireNonNull(restaurant).getName());
         restaurantAddress.setText(restaurant.getAddress());
 
         Picasso.get().load(restaurant.getImageUrl()).into(restaurantImage);
@@ -117,11 +118,11 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     private void setFloatingActionButton(Restaurant restaurant) {
 
         // Verify if restaurant is currently chosen, then set buttons state accordingly
-        UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
+        UserHelper.getUser(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                 .addOnSuccessListener(documentSnapshot -> {
 
                     User currentUser = documentSnapshot.toObject(User.class);
-                    if (currentUser.getChosenRestaurant() != null
+                    if (Objects.requireNonNull(currentUser).getChosenRestaurant() != null
                             && currentUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
 
                         checkFloatingActionButton.hide();
@@ -142,17 +143,12 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
                 }));
 
         // Remove restaurant from database and switch buttons
-        uncheckFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UserHelper.updateChosenRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), null)
-                        .addOnSuccessListener(aVoid -> {
+        uncheckFloatingActionButton.setOnClickListener(v -> UserHelper.updateChosenRestaurant(FirebaseAuth.getInstance().getCurrentUser().getUid(), null)
+                .addOnSuccessListener(aVoid -> {
 
-                            uncheckFloatingActionButton.hide();
-                            checkFloatingActionButton.show();
-                        });
-            }
-        });
+                    uncheckFloatingActionButton.hide();
+                    checkFloatingActionButton.show();
+                }));
 
     }
 
@@ -179,11 +175,11 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     private void setLikeButton(Restaurant restaurant) {
 
         // Verify if restaurant is currently chosen, then set buttons state accordingly
-        UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
+        UserHelper.getUser(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                 .addOnSuccessListener(documentSnapshot -> {
 
                     User currentUser = documentSnapshot.toObject(User.class);
-                    if (currentUser.getLikedRestaurants() != null) {
+                    if (Objects.requireNonNull(currentUser).getLikedRestaurants() != null) {
 
                         for (Restaurant likedRestaurant : currentUser.getLikedRestaurants()) {
                             if (likedRestaurant.getPlaceId().equals(restaurant.getPlaceId())) {
@@ -252,10 +248,10 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
         UserHelper.getAllUsers().addOnCompleteListener(task -> {
 
             if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
+                for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                     User createUser = document.toObject(User.class);
 
-                    if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) &&
+                    if (!createUser.getUserId().equals(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()) &&
                             createUser.getChosenRestaurant() != null
                             && createUser.getChosenRestaurant().getPlaceId().equals(restaurant.getPlaceId())) {
                         workmateList.add(createUser);

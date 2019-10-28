@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId "com.othman.go4lunch"
         minSdkVersion 19
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -58,6 +58,7 @@ dependencies {
     implementation 'com.jakewharton:butterknife:10.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.preference:preference:1.1.0'
+    implementation 'com.google.firebase:firebase-auth:19.1.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.0'
 
     // Firebase & FirebaseUI libraries
@@ -97,10 +98,10 @@ dependencies {
     implementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test:rules:1.2.0'
-    androidTestImplementation ('androidx.test.espresso:espresso-core:3.1.1', {
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    androidTestImplementation ('androidx.test.espresso:espresso-contrib:3.1.1') {
+    androidTestImplementation('androidx.test.espresso:espresso-contrib:3.1.1') {
         exclude group: 'com.android.support', module: 'appcompat'
         exclude group: 'com.android.support', module: 'support-v4'
         exclude module: 'recyclerview-v7'

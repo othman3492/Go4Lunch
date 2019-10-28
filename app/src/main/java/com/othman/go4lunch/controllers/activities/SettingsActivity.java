@@ -20,6 +20,7 @@ import com.othman.go4lunch.utils.NotificationReceiver;
 import com.othman.go4lunch.utils.UserHelper;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,11 +49,11 @@ public class SettingsActivity extends AppCompatActivity {
     private void setNotificationsSwitch() {
 
         // Get switch state from Firestore
-        UserHelper.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
+        UserHelper.getUser(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                 .addOnSuccessListener(documentSnapshot -> {
 
                     User currentUser = documentSnapshot.toObject(User.class);
-                    if (currentUser.isNotificationsEnabled()) {
+                    if (Objects.requireNonNull(currentUser).isNotificationsEnabled()) {
 
                         notificationsSwitch.setChecked(true);
                     }

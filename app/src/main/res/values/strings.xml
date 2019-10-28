@@ -13,13 +13,13 @@
     <string name="error_unknown_error">Unknown error</string>
     <string name="connection_succeed">Authentication successful</string>
 
-    <string name="facebook_application_id" translatable="false">390333651683057</string>
-    <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">fb390333651683057</string>
+    <string name="facebook_application_id" translatable="false">413982862832829</string>
+    <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">fb413982862832829</string>
 
     <string name="google_maps_api_key" translatable="false">AIzaSyCL9H63r5Z9zX7QQ2UVPzJ5iTCFVrz3iTE</string>
 
-    <string name="twitter_consumer_key" translatable="false">iq6nJsR2PQm9AeCTFhNi1sS1P</string>
-    <string name="twitter_consumer_secret" translatable="false">nfnB01cMJy5LzGGSDtQ2LE4mdtlWP8I9stoW3rRTdpYw3h0Egw</string>
+    <string name="twitter_consumer_key" translatable="false">drWeGy0eAyar1huLud3mOjNXZ</string>
+    <string name="twitter_consumer_secret" translatable="false">dZB0kEayXaKD0CtmjkWaKjFmqFK06UIBLIhFIuy7HlW9EegjHF</string>
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
@@ -56,9 +56,11 @@
     <string name="delete_account">DELETE ACCOUNT</string>
     <string name="no_restaurant_selected">There\'s no restaurant selected</string>
     <string name="unlike">UNLIKE</string>
+    <string name="distance" translatable="false">%s m</string>
     <string name="someone_is_joining">%1s is joining !</string>
     <string name="choice">%s is going to %s today !</string>
     <string name="no_choice">%s has not chosen any restaurant today.</string>
     <string name="notification_alone">Today, you\'re going to %s, %s !</string>
     <string name="notification_with_colleagues">Today, you\'re going to %s, %s with %s !</string>
+    <string name="app_logo" translatable="false">App logo</string>
 </resources>

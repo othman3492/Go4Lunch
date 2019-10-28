@@ -21,6 +21,7 @@ import com.othman.go4lunch.views.WorkmatesAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -67,11 +68,11 @@ public class WorkmatesFragment extends Fragment {
 
             if (task.isSuccessful()) {
 
-                for (QueryDocumentSnapshot document : task.getResult()) {
+                for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
 
                     User createUser = document.toObject(User.class);
 
-                    if (!createUser.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
+                    if (!createUser.getUserId().equals(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()))
                     workmateList.add(createUser);
                 }
 
