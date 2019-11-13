@@ -1,6 +1,5 @@
 package com.othman.go4lunch.models;
 
-import androidx.annotation.Nullable;
 
 import java.util.List;
 
@@ -8,7 +7,6 @@ public class User {
 
     private String userId;
     private String username;
-    @Nullable
     private String urlPicture;
     private Restaurant chosenRestaurant;
     private List<Restaurant> likedRestaurants;
@@ -20,7 +18,7 @@ public class User {
     }
 
 
-    public User(String userId, String username, @org.jetbrains.annotations.Nullable String urlPicture, Restaurant restaurant,
+    public User(String userId, String username, String urlPicture, Restaurant restaurant,
                 List<Restaurant> likedRestaurants, boolean isEnabled) {
 
         this.userId = userId;
@@ -64,12 +62,11 @@ public class User {
         this.username = username;
     }
 
-    @Nullable
     public String getUrlPicture() {
         return urlPicture;
     }
 
-    public void setUrlPicture(@Nullable String urlPicture) {
+    public void setUrlPicture(String urlPicture) {
         this.urlPicture = urlPicture;
     }
 
