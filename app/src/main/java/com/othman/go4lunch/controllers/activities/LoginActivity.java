@@ -165,7 +165,7 @@ public class LoginActivity extends AppCompatActivity {
     private void createUserInFirestore() {
 
         String urlPicture = (Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhotoUrl() != null) ?
-                FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString() : null;
+                Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl()).toString() : null;
         String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 

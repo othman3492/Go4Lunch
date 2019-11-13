@@ -20,7 +20,7 @@ public class User {
     }
 
 
-    public User(String userId, String username, String urlPicture, Restaurant restaurant,
+    public User(String userId, String username, @org.jetbrains.annotations.Nullable String urlPicture, Restaurant restaurant,
                 List<Restaurant> likedRestaurants, boolean isEnabled) {
 
         this.userId = userId;

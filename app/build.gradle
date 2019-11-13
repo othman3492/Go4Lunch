@@ -62,9 +62,9 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.0'
 
     // Firebase & FirebaseUI libraries
-    implementation 'com.google.firebase:firebase-analytics:17.2.0'
-    implementation 'com.google.firebase:firebase-core:17.2.0'
-    implementation 'com.google.firebase:firebase-inappmessaging:19.0.1'
+    implementation 'com.google.firebase:firebase-analytics:17.2.1'
+    implementation 'com.google.firebase:firebase-core:17.2.1'
+    implementation 'com.google.firebase:firebase-inappmessaging:19.0.2'
     implementation 'com.firebaseui:firebase-ui-auth:5.1.0'
     implementation 'com.firebaseui:firebase-ui-database:5.1.0'
     implementation 'com.firebaseui:firebase-ui-storage:5.1.0'
@@ -78,7 +78,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
     implementation 'com.google.android.gms:play-services-places:17.0.0'
-    implementation 'com.google.android.libraries.places:places:2.0.0'
+    implementation 'com.google.android.libraries.places:places:2.1.0'
 
     // Retrofit & RXJava2/RXAndroid libraries
     implementation 'io.reactivex.rxjava2:rxjava:2.1.14'

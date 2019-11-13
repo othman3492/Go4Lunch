@@ -275,8 +275,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     // Set markers on map for all restaurants and set info windows on click to open RestaurantDetailsActivity
     private void setMarkersOnMap(GoogleMap map, List<Restaurant> restaurantList) {
 
-        ArrayList<Restaurant> restaurantList1 = new ArrayList<>(restaurantList);
-
         for (Restaurant restaurant : restaurantList) {
 
             Marker marker = map.addMarker(new MarkerOptions()
