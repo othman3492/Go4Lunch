@@ -18,8 +18,6 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.GeoDataClient;
-import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -28,7 +26,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -50,9 +47,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
-
-import static com.google.android.gms.location.places.Places.getGeoDataClient;
-import static com.google.android.gms.location.places.Places.getPlaceDetectionClient;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
@@ -76,7 +70,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private double currentLongitude;
 
     // Keys for storing fragment state
-    private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
 
@@ -92,16 +85,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // Retrieve location and camera position from saved instance state
         if (savedInstanceState != null) {
             lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-            CameraPosition cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, view);
 
-        GeoDataClient geoDataClient = getGeoDataClient(Objects.requireNonNull(getContext()));
-        PlaceDetectionClient placeDetectionClient = getPlaceDetectionClient(getContext());
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(Objects.requireNonNull(getContext()));
 
 
         return view;
